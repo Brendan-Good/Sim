@@ -1,0 +1,12 @@
+If you have a package manager (e.g. apt-get), use that to install python's 'setuptools' and 'pip'. It's also available on cygwin's setup.exe
+
+If you don't have apt-get or cygwin, but are using a Mac, execute this (as root) on the terminal:
+$ wget https://bitbucket.org/pypa/setuptools/raw/0.7.7/ez_setup.py -O - | python
+
+If you were able to install pip with the package manager, execute this:
+$ pip install cython
+
+Otherwise, execute:
+$ curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+$ python get-pip.py
+$ pip install cython
