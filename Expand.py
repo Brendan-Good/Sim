@@ -5,7 +5,7 @@ from bitstring import BitArray
 import copy
 
 def Expand(graph):
-    ' ' ' Takes in a BitArray and returns a list of all possible positions after taking one move.
+    ' ' ' Takes in a BitArray and returns a list of all possible positions after taking one move. 
     ' ' '
 
      move_list = []
