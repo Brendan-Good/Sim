@@ -209,10 +209,11 @@ def print_board(board):
     print()
     return None
 
-#play a short game
-board = new_board()
-for i in range(0, N*M + 1):
-    board = negamax(board, MAX_DEPTH, -inf, +inf, (((i + 1) % 2) * 2 - 1))[0]
-    print_board(board)
-    if board == None:
-        break
+if __name__ == '__main__':
+    #play a short game
+    board = new_board()
+    for i in range(0, N*M + 1):
+        board = negamax(board, MAX_DEPTH, -inf, +inf, (((i + 1) % 2) * 2 - 1))[0]
+        print_board(board)
+        if board == None:
+            break
