@@ -3,7 +3,7 @@
 #Negamax implementation by Joshua Brule
 
 import sys
-import Expand
+import Sim
 import SimMCTest
 
 from collections import deque
@@ -31,7 +31,7 @@ def negamax(node, alpha, beta, player, depth = 15):
     
     else:
         candidate_move = None
-        for move in Expand(node):
+        for move in Sim.Expand(node):
             val = -1 * negamax(move.reverse(0,len(move)), depth - 1, -beta, -alpha, -player)[1]
             if val >= beta:
                 return (None, val)
@@ -43,8 +43,7 @@ def negamax(node, alpha, beta, player, depth = 15):
 # method by Tucker Bane
         
 def move_extractor(changed_graph,unchanged_graph):
-    '''Takes in two BitArrays and returns the index of the first diget the BitArrays differ on. Used on a graph and that graph after a move has been made to find what that move was.
-    '''
+    '''Takes in two BitArrays and returns the index of the first diget the BitArrays differ on. Used on a graph and that graph after a move has been made to find what that move was.'''
     and_graph = changed_graph ^ unchanged_graph
 
     location = (and_graph.bin).find('1')
