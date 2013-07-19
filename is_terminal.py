@@ -4,16 +4,18 @@ import scipy
 import math
 import itertools
 
-end_condition = 4
+end_condition = 3
 
-graph_size = 18
+graph_size = 6
 
 vertices_set=set(range(graph_size))
 
 possible_kl = list(map(set, itertools.combinations(vertices_set,end_condition)))
 
-def generate_structure():
-    numpy.zeros(shape=[18]*4,dtype=float)
+def generate_structure(n,l):
+    graph_size = n
+    end_condition = l
+    return numpy.zeros(shape=[n]*l,dtype=float)
     
 def is_terminal(structure,edge):
     relevant_kl=update_structure(structure,edge)
