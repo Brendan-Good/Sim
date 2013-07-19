@@ -4,6 +4,7 @@ from bitstring import BitArray
 import sys 
 import random
 import math
+import copy
 
 Graph_Size = int(sys.argv[1]) 
 
@@ -44,7 +45,7 @@ class node:
         self.value = value
         self.board = board
         
-def color_red(edge,graph_rep):
+def color_red(edge,graph_rep,red_edges=[]):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
     edge = sorted(edge)
@@ -52,9 +53,10 @@ def color_red(edge,graph_rep):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
+    red_edges.append(edge)
     return graph_rep 
     
-def color_blue(edge,graph_rep):
+def color_blue(edge,graph_rep,blue_edges):
     ''' Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 01 which 
     will be our convention for saying an edge is blue.  ''' 
 
@@ -63,25 +65,9 @@ def color_blue(edge,graph_rep):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
+    blue_edges.append(edge)
     return graph_rep
 
-#def check_win(Color,Edges_to_Check,turn_number,past_iterations,win_subgraph):
-#    ''' this takes in the most recent edge colored and the graph representation and checks to see if the colored graph now makes 
-#    a k_n '''
-#    colored_list = []
-#    for edges in Edges_to_Check:
-#        if(color(Edges)==Color):
-#            colored_list.append(Edges)
-#    if(len(colored_list)<win_subgraph-past_iterations-1):
-#        return false
-#    else:
-#        past_iterations += 1
-#        if(past_iterations==win_subgraph):
-#            print("Winning move") 
-#            return true
-#        else:
-#            isterminal(Color,colored_list,turn_number,past_iterations,win_subgraph)
-             
 def is_terminal(Edge,Edges_to_Check,turn_number):
     if(turn_number==(n*(n-1))/2 or check_win(Edge,Edges_to_Check)):
         return true
@@ -92,11 +78,13 @@ def is_terminal(Edge,Edges_to_Check,turn_number):
 
 def check_win(Edge,Edges_to_Check):
     colored_list = []
-    stored_vertices = [Edge[0]]
+    stored_vertices = []
     if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):
         return False
     else:
         for edges in Edges_to_Check:
+            if(edges==Edge):
+                continue
             if(edges[0] == Edge[0]):
                 colored_list.append(edges)
                 stored_vertices.append(edges[1])
@@ -108,19 +96,39 @@ def check_win(Edge,Edges_to_Check):
         if(len(colored_list)<win_subgraph-1):
             return False
         else:
-            Edges_to_Check_0 = []
-            for x in range(len(stored_vertices)-1):
-                for y in range(x,len(stored_vertices)):
-                    if(connect(stored_vertices[x],stored_vertices[y]) in Edges_to_Check):
-                        Edges_to_Check_0.append(connect(stored_vertices[x],stored_vertices[y]))
-            print(Edges_to_Check_0)
-            if(len(Edges_to_Check_0)<(win_subgraph*(win_subgraph-1))/2):
+            l_minus_2_combinations = list(itertools.combinations(stored_vertices,win_subgraph-2))
+            for combinations in len(l_minus_2_combinations):
+                l_minus_2_combinations[combinations]=list(l_minus_2_combinations[combinations])
+                l_minus_2_combinations[combinations].append(Edge[0])
+                l_minus_2_combinations[combinations].append(Edge[1])
+                potential_kl = []
+                iterator = 0
+                for x in range(win_subgraph-1):
+                    for y in range(x+1,win_subgraph):
+                        if(connect(comb[x][y] in Edges_to_Check)):
+                            potential_kl.append(connect(comb[x][y]))
+                if(len(potential_kl)>=(win_subgraph*(win_subgraph-1))/2):
+                    return True
+                else:
+                    iterator+=1
+            if(iterator==len(l_minus_2_combinations)):
                 return False
-            else:
-                return True
+                        
+                        
+            #Edges_to_Check_0 = set()
+            #for x in range(len(stored_vertices)-1):
+            #    for y in range(x,len(stored_vertices)):
+            #        if(connect(stored_vertices[x],stored_vertices[y]) in Edges_to_Check):
+            #            Edges_to_Check_0 = Edges_to_Check_0|connect(stored_vertices[x],stored_vertices[y])
+            #print(Edges_to_Check_0)
+            #potential_kl=list(itertools.combinations(Edges_to_Check_0, win_subgraph-2))
+            #if():
+            #    return False
+            #else:
+            #    return True
                         
 def connect(vertex1,vertex2):
-    edge = [min(vertex1,vertex2),max(vertex1,vertex2)]
+    edge = (min(vertex1,vertex2),max(vertex1,vertex2))
     return edge            
 
 def get_edges(turns)

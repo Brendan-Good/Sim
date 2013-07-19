@@ -2,6 +2,7 @@
 import numpy
 import scipy
 import math
+import itertools
 
 end_condition = 4
 
@@ -27,20 +28,20 @@ def is_terminal(structure,edge):
 
 def update_structure(structure,edge,turn):
     for kls in changed_kl(edge):
-        if(structure(kls) != float("-inf")):
+        if(structure[kls] != float("-inf")):
             if(turn%2==1):
-                if(structure(kls)>=0):
-                    structure(kls)+=1
+                if(structure[kls]>=0):
+                    structure[kls]+=1
                 else:
-                    structure(kls)=float("-inf")
+                    structure[kls]=float("-inf")
             else:
-                if(structure(kls)<=0):
-                    structure(kls)-=1
+                if(structure[kls]<=0):
+                    structure[kls]-=1
                 else:
-                    structure(kls)=float("-inf")
+                    structure[kls]=float("-inf")
     return(structure)
 
-def changed_kl(structure,edge) 
+def changed_kl(structure,edge): 
     relevant_kl = []
     for index in range(possible_kl):
         if({edge[0],edge[1]}<=possible_kl[index]):#if the edge is a subset of all of the possible kl's, add it to the list of changed kl's
