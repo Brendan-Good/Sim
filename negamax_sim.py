@@ -5,6 +5,7 @@
 import sys
 import Adj_Maxtix_Expand
 import is_terminal
+import Nega
 
 from collections import deque
 from copy import deepcopy
@@ -15,23 +16,24 @@ MAX_DEPTH = 15
 
 inf = float('inf')
 
-def play_game()
+def play_game():
     adj = [[0 for col in range(6)] for row in range(6)]
     abst = [6,0,0]
     tuples = is_terminal.generate_structure(6,3)
     scope = -1
     depth = 1
-    graph = {'adj':adj,'abst':abst,'tuples':tuples,'scope':scope,'depth':depth}
-    
+    turn_number = 1
+    graph['game_over'] = False
     game_over = False
-
-    while (!game_over):
-        move = negamax(graph,-inf,+inf,1,15)
-
-        game_over = is_terminal.is_terminal(graph['tuples'],edge)
-
+    graph = {'adj':adj,'abst':abst,'tuples':tuples,'scope':scope,'depth':depth,'turn_number':turn_number}
     
 
+    while(not game_over):
+        graph = negamax(graph,-inf,+inf,1,15)
+        print(graph)
+        graph = Nega.Nega(graph)
+        grph['turn_number']+=1
+        game_over = graph['game_over']
 
 def negamax(node, alpha, beta, player, depth):
     '''Perform a depth limited negamax search using functions eval(), expand()
@@ -42,7 +44,7 @@ def negamax(node, alpha, beta, player, depth):
     Usage: negamax(new_board(), -inf, +inf, 1, MAX_DEPTH)'''
     
 
-    if is_termial.is_terminal(node):
+    if node['game_over']:
         return (None, +inf)
     elif depth == 0:
         return(None,0)

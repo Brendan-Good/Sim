@@ -44,10 +44,17 @@ def Expand(graph):
                 new_graph = copy.deepcopy(graph)
                 new_graph['depth']+=1
                 new_graph['adj'][real_num][real_num2]=1
+                add_edge(graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
           
     return child_graphs
 
+def add_edge(graph,n,m,wrong_turn = False):
+    edge = [n,m]
+    if wrong_turn: 
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number']-1)
+    else:
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
     non-abstract nodes to the adj matrix '''
@@ -61,6 +68,7 @@ def update_abst_nodes(graph,cat1,cat2):
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_adj(graph,cat2)
         graph['adj'][vert_num1][vert_num2] = 1
+        add_edge(graph,vert_num1,vert_num2)
                     
 def kick_to_adj(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
@@ -75,11 +83,13 @@ def kick_to_adj(graph,abst_type):
 
     elif abst_type ==1:
         graph['adj'][scope+1][scope+2] =1
+        add_edge(graph,scope+1,scope+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         graph['adj'][scope+1][scope+2] =-1
+        add_edge(graph,scope+1,scope+2,True)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
@@ -93,6 +103,7 @@ def update_real_abst(graph,real_coords,abst_type):
     graph['abst'][abst_type] -=1
     vert_num = kick_to_adj(graph,abst_type)
     graph['adj'][real_coords][vert_num] = 1
+    add_edge(graph,real_coords,vert_num)
         
 def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
