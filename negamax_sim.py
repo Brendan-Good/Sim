@@ -10,8 +10,6 @@ import Nega
 from collections import deque
 from copy import deepcopy
 
-N = 7
-M = 8
 MAX_DEPTH = 15
 
 inf = float('inf')
@@ -20,19 +18,18 @@ def play_game():
     adj = [[0 for col in range(6)] for row in range(6)]
     abst = [6,0,0]
     tuples = is_terminal.generate_structure(6,3)
+    print(tuples,"tuples in negamax")
     scope = -1
     depth = 1
     turn_number = 1
-    graph['game_over'] = False
     game_over = False
-    graph = {'adj':adj,'abst':abst,'tuples':tuples,'scope':scope,'depth':depth,'turn_number':turn_number}
+    graph = {'adj':adj,'abst':abst,'tuples':tuples,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False}
     
-
+    print("stuff happend")
     while(not game_over):
-        graph = negamax(graph,-inf,+inf,1,15)
-        print(graph)
-        graph = Nega.Nega(graph)
-        grph['turn_number']+=1
+        graph = negamax(graph,-inf,+inf,1,15)[0]
+        Nega.Nega(graph)
+        graph['turn_number']+=1
         game_over = graph['game_over']
 
 def negamax(node, alpha, beta, player, depth):
@@ -42,24 +39,25 @@ def negamax(node, alpha, beta, player, depth):
     Returns (optimal move, negamax value)
     
     Usage: negamax(new_board(), -inf, +inf, 1, MAX_DEPTH)'''
-    
+    print("pies")
+    #print(node)
+    game_over = node['game_over']
 
-    if node['game_over']:
+    if game_over:
         return (None, +inf)
     elif depth == 0:
         return(None,0)
 
     else:
         candidate_move = None
-        for move in Adj_Maxtox.Expand.Expand(node):
-            val = -1 * negamax(move.reverse(0,len(move)), depth - 1, -beta, -alpha, -player)[1]
+        for move in Adj_Maxtix_Expand.Expand(node):
+            Nega.Nega(move)
+            val = -1 * negamax(move, depth - 1, -beta, -alpha, -player)[1]
             if val >= beta:
                 return (None, val)
             if val > alpha:
                 candidate_move = move
                 alpha = val
-
-
         return (candidate_move, alpha)
 # method by Tucker Bane
         

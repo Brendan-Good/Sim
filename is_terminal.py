@@ -29,8 +29,12 @@ def is_terminal(structure,edge,turn):
         return False
 
 def update_structure(structure,edge,turn):
-    for kls in changed_kl(edge):
-        if(structure[kls] != float("-inf")):
+    print(structure,"tuples in update_structure")
+    print(structure[0,1,2],"test")
+    changed_kls = changed_kl(structure,edge)
+    for kls in range(len(changed_kls)):
+        print(changed_kls[kls],"for loop")
+        if(structure[changed_kls[kls]] != float("-inf")):
             if(turn%2==1):
                 if(structure[kls]>=0):
                     structure[kls]+=1
@@ -45,7 +49,7 @@ def update_structure(structure,edge,turn):
 
 def changed_kl(structure,edge): 
     relevant_kl = []
-    for index in range(possible_kl):
+    for index in range(len(possible_kl)):
         if({edge[0],edge[1]}<=possible_kl[index]):#if the edge is a subset of all of the possible kl's, add it to the list of changed kl's
             relevant_kl.append(list(possible_kl[index]))
     return relevant_kl

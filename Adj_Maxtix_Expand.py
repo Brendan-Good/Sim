@@ -55,6 +55,7 @@ def add_edge(graph,n,m,wrong_turn = False):
         graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number']-1)
     else:
         graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
+
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
     non-abstract nodes to the adj matrix '''
@@ -76,24 +77,24 @@ def kick_to_adj(graph,abst_type):
     returns vert number of the first node kicked.
     It may someday return the locations of the begining and end of the
     abstract structure kicked if need be.'''
-   
+    
     if abst_type ==0:
         graph['scope']+=1
         vert_num = graph['scope']
 
     elif abst_type ==1:
-        graph['adj'][scope+1][scope+2] =1
-        add_edge(graph,scope+1,scope+2)
+        graph['adj'][graph['scope']+1][graph['scope']+2] =1
+        add_edge(graph,graph['scope']+1,graph['scope']+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
-        graph['adj'][scope+1][scope+2] =-1
-        add_edge(graph,scope+1,scope+2,True)
+        graph['adj'][graph['scope']+1][graph['scope']+2] =-1
+        add_edge(graph,graph['scope']+1,graph['scope']+2,True)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
-        print("something's gone horribly wrong")
+        print("something's gone horribly wrong (1)")
 
     return vert_num
 
