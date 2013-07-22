@@ -5,30 +5,46 @@ import sys
 import random
 import math
 import copy
+import itertools
 
-Graph_Size = int(sys.argv[1]) 
+Graph_Size = int(sys.argv[1])
 
-win_subgraph = int(sys.argv[2])
+win_subgraph = int(sys.argv[2]) 
 
 Graph_Rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
 #each edge is uncolored
+
+root = node([],[],0,0,0,Graph_Rep)
 
 red_edges = []
 blue_edges = []
 
 max_iterations = 10000
 
+total_runs = 0
+
 def monte_carlo():
-
-
+    
+    return 0
 
 def update_statistics(node,value,depth):
-    
-    while depth > 0:
+    node.runs +=1
+    total_runs +=1
+    node.value = (node.wins+value)/runs
+    return node
+
+def best_child(node):
+    return 0
+
+def recursive_update():
+    return 0
+
+def value(node):
+    return node.value
 
 def play_random(node,player_turn,):
     original_node=node
-    while(!is_terminal(Edges_to_Check,turn_number)):
+    while(not is_terminal(Edges_to_Check,turn_number)):
         expand(node)
         node = random.choice(node.children)
         player_turn+=1
@@ -77,7 +93,7 @@ def is_terminal(Edge,Edges_to_Check,turn_number):
 # If this is less than l-1, then no. else, 
 
 def check_win(Edge,Edges_to_Check):
-    colored_list = []
+    colored_list = [[Edge[0],Edge[1]]]
     stored_vertices = []
     if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):
         return False
@@ -92,25 +108,29 @@ def check_win(Edge,Edges_to_Check):
                 if(edges[1]==Edge[0]):
                     colored_list.append(edges)
                     stored_vertices.append(edges[0])
-        print(stored_vertices)
+        print(stored_vertices,"stored_vertices")
+        print(colored_list,"colored_list")
         if(len(colored_list)<win_subgraph-1):
             return False
         else:
             l_minus_2_combinations = list(itertools.combinations(stored_vertices,win_subgraph-2))
-            for combinations in len(l_minus_2_combinations):
+            iterator = 0
+            for combinations in range(len(l_minus_2_combinations)):
                 l_minus_2_combinations[combinations]=list(l_minus_2_combinations[combinations])
                 l_minus_2_combinations[combinations].append(Edge[0])
                 l_minus_2_combinations[combinations].append(Edge[1])
+                print(l_minus_2_combinations,"l-2 combinations")
                 potential_kl = []
-                iterator = 0
                 for x in range(win_subgraph-1):
                     for y in range(x+1,win_subgraph):
-                        if(connect(comb[x][y] in Edges_to_Check)):
-                            potential_kl.append(connect(comb[x][y]))
+                        if(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]) in Edges_to_Check):
+                            potential_kl.append(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]))
+                            print(potential_kl,"potential_kl")
                 if(len(potential_kl)>=(win_subgraph*(win_subgraph-1))/2):
                     return True
                 else:
                     iterator+=1
+                    print(iterator)
             if(iterator==len(l_minus_2_combinations)):
                 return False
                         
@@ -128,10 +148,10 @@ def check_win(Edge,Edges_to_Check):
             #    return True
                         
 def connect(vertex1,vertex2):
-    edge = (min(vertex1,vertex2),max(vertex1,vertex2))
+    edge = [min(vertex1,vertex2),max(vertex1,vertex2)]
     return edge            
 
-def get_edges(turns)
+def get_edges(turns):
     if(turns%2==1):
         return red_edges
     else:
@@ -139,5 +159,4 @@ def get_edges(turns)
         
 
 #The following two lines are to see if the code works as expected.
-color_blue([0,1],Graph_Rep)
 print(Graph_Rep.bin)
