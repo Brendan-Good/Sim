@@ -1,11 +1,12 @@
 #!/usr/bin/python3
-
+#TO DO! Make sure the statistics are passed up correctly (sign flipping? I have not done that yet).  
 from bitstring import BitArray 
 import sys 
 import random
 import math
 import copy
 import itertools
+import Adj_Maxtix_Expand
 
 Graph_Size = 18
 
@@ -13,42 +14,6 @@ win_subgraph = 4
 
 Graph_Rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
 #each edge is uncolored
-
-
-red_edges = []
-blue_edges = []
-
-max_iterations = 10000
-
-total_runs = 0
-
-def monte_carlo():
-    
-    return 0
-
-def update_statistics(node,value,depth):
-    node.runs +=1
-    total_runs +=1
-    node.value = (node.wins+value)/runs
-    return node
-
-def best_child(node):
-    return 0
-
-def recursive_update():
-    return 0
-
-def value(node):
-    return node.value
-
-def play_random(node,player_turn,):
-    original_node=node
-    while(not is_terminal(Edges_to_Check,turn_number)):
-        expand(node)
-        node = random.choice(node.children)
-        player_turn+=1
-    if(player_turn%2==1):
-        original_node.wins+=1
 
 class Node:
     def __init__(self,parent,children,runs,wins,value,board):
@@ -61,7 +26,52 @@ class Node:
         self.board = board
 
 root = Node([],[],0,0,0,Graph_Rep)
-        
+
+total_runs = 0
+
+red_edges = []
+
+blue_edges = []
+
+max_iterations = 10000
+
+total_runs = 0
+
+def monte_carlo(max_iterations,node=root):
+    while node.children != [] or max_iterations > 0:
+        node = best_child(node)
+        for boards in Adj_Maxtix_Expand.Expand(best_child(node)):
+            node.append(Node(node,[],0,0,float('inf'),boards))
+
+def update_statistics(node,value):
+    node.runs += 1
+    global total_runs += 1
+    node.value = (node.wins+value)/node.runs
+    recursive_update(node)
+    return node
+
+def recursive_update(node):
+    while(node!=root):
+        node = node.parent
+        for children in node.children:
+            node.value = (children.runs/total_runs)*children.value
+
+def best_child(node):
+    return max(node.children,key=value)
+
+def value(node):
+    value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
+    return value
+
+def play_random(node,player_turn,):
+    original_node=node
+    while(not is_terminal(Edges_to_Check,turn_number)):
+        expand(node)
+        node = random.choice(node.children)
+        player_turn+=1
+    if(player_turn%2==1):
+        original_node.wins+=1
+
 def color_red(edge,graph_rep,red_edges=[]):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
@@ -70,7 +80,7 @@ def color_red(edge,graph_rep,red_edges=[]):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
-    red_edges.append(edge)
+    global red_edges.append(edge)
     return graph_rep 
     
 def color_blue(edge,graph_rep,blue_edges):
@@ -82,7 +92,7 @@ def color_blue(edge,graph_rep,blue_edges):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
-    blue_edges.append(edge)
+    global blue_edges.append(edge)
     return graph_rep
 
 def is_terminal(Edge,Edges_to_Check,turn_number):
