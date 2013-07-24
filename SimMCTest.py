@@ -45,7 +45,8 @@ def monte_carlo(max_iterations,node=root):
 
 def update_statistics(node,value):
     node.runs += 1
-    global total_runs += 1
+    global total_runs
+    total_runs += 1
     node.value = (node.wins+value)/node.runs
     recursive_update(node)
     return node
@@ -63,6 +64,7 @@ def value(node):
     value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
     return value
 
+#I actually do not want to expand, but to 
 def play_random(node,player_turn,):
     original_node=node
     while(not is_terminal(Edges_to_Check,turn_number)):
@@ -72,7 +74,7 @@ def play_random(node,player_turn,):
     if(player_turn%2==1):
         original_node.wins+=1
 
-def color_red(edge,graph_rep,red_edges=[]):
+def color_red(edge,graph_rep):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
     edge = sorted(edge)
@@ -80,10 +82,11 @@ def color_red(edge,graph_rep,red_edges=[]):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
-    global red_edges.append(edge)
+    global red_edges
+    red_edges.append(edge)
     return graph_rep 
     
-def color_blue(edge,graph_rep,blue_edges):
+def color_blue(edge,graph_rep):
     ''' Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 01 which 
     will be our convention for saying an edge is blue.  ''' 
 
@@ -92,7 +95,8 @@ def color_blue(edge,graph_rep,blue_edges):
     n = edge[1]
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
-    global blue_edges.append(edge)
+    global blue_edges
+    blue_edges.append(edge)
     return graph_rep
 
 def is_terminal(Edge,Edges_to_Check,turn_number):
