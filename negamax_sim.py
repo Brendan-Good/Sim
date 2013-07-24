@@ -18,16 +18,16 @@ def play_game():
     adj = [[0 for col in range(6)] for row in range(6)]
     abst = [6,0,0]
     tuples = is_terminal.generate_structure(6,3)
-    print(tuples,"tuples in negamax")
     scope = -1
-    depth = 1
+    depth = 15
     turn_number = 1
     game_over = False
     graph = {'adj':adj,'abst':abst,'tuples':tuples,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False}
     
-    print("stuff happend")
+    
     while(not game_over):
         graph = negamax(graph,-inf,+inf,1,15)[0]
+        print(graph,"graph")
         Nega.Nega(graph)
         graph['turn_number']+=1
         game_over = graph['game_over']
@@ -39,12 +39,12 @@ def negamax(node, alpha, beta, player, depth):
     Returns (optimal move, negamax value)
     
     Usage: negamax(new_board(), -inf, +inf, 1, MAX_DEPTH)'''
-    print("pies")
+    print("nega entered")
     #print(node)
     game_over = node['game_over']
 
     if game_over:
-        return (None, +inf)
+        return (None, -inf)
     elif depth == 0:
         return(None,0)
 
@@ -53,6 +53,8 @@ def negamax(node, alpha, beta, player, depth):
         for move in Adj_Maxtix_Expand.Expand(node):
             Nega.Nega(move)
             val = -1 * negamax(move, depth - 1, -beta, -alpha, -player)[1]
+            print(val,"value")
+            Nega.Nega(move)
             if val >= beta:
                 return (None, val)
             if val > alpha:

@@ -23,31 +23,32 @@ def Expand(graph):
     for cat_num in range(0,len(graph['abst'])):
         for cat_num2 in range(cat_num,len(graph['abst'])):
             if graph['abst'][cat_num] != 0 and graph['abst'][cat_num2] != 0 and(cat_num != cat_num2 or graph['abst'][cat_num]>1):
-                new_graph = copy.deepcopy(graph)
-                new_graph['depth']+=1
+                new_graph = layer_update(graph)
                 update_abst_nodes(new_graph,cat_num,cat_num2)
                 child_graphs.append(new_graph)
 
     for real_num in range(0,graph['scope']+1):
         for cat_num in range(0,len(graph['abst'])):
-            #print("real_abst tripped")
             if graph['abst'][cat_num]!=0:
-                #print("real_abst if tripped")   
-                new_graph = copy.deepcopy(graph)
-                new_graph['depth']+=1
+                new_graph = layer_update(graph)
                 update_real_abst(new_graph,real_num,cat_num)
                 child_graphs.append(new_graph)
     
     for real_num in range(0,graph['scope']+1):
         for real_num2 in range(real_num+1,graph['scope']+1):
             if graph['adj'][real_num][real_num2] == 0:
-                new_graph = copy.deepcopy(graph)
-                new_graph['depth']+=1
+                new_graph = layer_update(graph)
                 new_graph['adj'][real_num][real_num2]=1
-                add_edge(graph,real_num,real_num2)                
+                add_edge(new_graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
           
     return child_graphs
+
+def layer_update(graph):
+    new_graph = copy.deepcopy(graph)
+    new_graph['depth']+=1
+    new_graph['turn_number']+=1
+    return new_graph
 
 def add_edge(graph,n,m,wrong_turn = False):
     edge = [n,m]
