@@ -21,7 +21,7 @@ def is_terminal(structure,edge,turn):
     relevant_kl=update_structure(structure,edge,turn)[1]
     kl_checked = 0
     for index in range(len(relevant_kl)):#For changed kl's check to see if they have value equal to l*(l-1)/2. If so, it's a win. Otherwise increment a counter.
-        if(structure[relevant_kl[index]]==(end_condition*(end_condition-1))/2):
+        if(structure[relevant_kl[index]]==(end_condition*(end_condition-1))/2 or structure[relevant_kl[index]]== -1*((end_condition*(end_condition-1))/2)):
             return True 
         else:
             kl_checked+=1

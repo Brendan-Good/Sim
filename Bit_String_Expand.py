@@ -2,6 +2,21 @@
 
 import copy
 import is_terminal
+import SimMC
+from bitstring import BitArray
+
+def Test_Expand():
+    adj = [[0 for col in range(6)] for row in range(6)]
+    abst = [6,0,0]
+    tuples = is_terminal.generate_structure(6,3)
+    scope = -1
+    depth = 15
+    turn_number = 1
+    game_over = False
+    graph_rep = 30*BitArray(bin='0')
+    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep}
+    
+    return Expand(graph)
 
 def Expand(graph):
     ''' Takes in a graph dictionary and returns a list of all possible graphs
@@ -10,9 +25,12 @@ def Expand(graph):
     number of isolated green/blue/2nd edges. Returns a list of graphs after
     distinct moves with an attached list of metadata (abstract node numbers).
     adapt to work with BitArray?
+
+    add_edge should probably be update_structure
     
     Recommended starting values:
-    graph['adj']: full size, all zeros
+    graph['turn_number']: 1
+    graph['graph_rep']: full size, all zeros, bit_string object
     graph['abst']: graph['abst'][0]= number of nodes
     graph['scope']: -1
     graph['depth']: 1'''
@@ -36,9 +54,10 @@ def Expand(graph):
     
     for real_num in range(0,graph['scope']+1):
         for real_num2 in range(real_num+1,graph['scope']+1):
-            if graph['adj'][real_num][real_num2] == 0:
+            if get_edge(graph,real_num,real_num2) == 0:
                 new_graph = layer_update(graph)
-                new_graph['adj'][real_num][real_num2]=1
+                edge = [real_num,real_num2]
+                SimMC.color_red(edge,new_graph['graph_rep'],new_graph['red_edges'])
                 add_edge(new_graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
           
@@ -69,7 +88,8 @@ def update_abst_nodes(graph,cat1,cat2):
         vert_num1 = kick_to_adj(graph,cat1) 
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_adj(graph,cat2)
-        graph['adj'][vert_num1][vert_num2] = 1
+        edge = [vert_num1,vert_num2]
+        SimMC.color_red(edge,graph['graph_rep'],graph['red_edges'])
         add_edge(graph,vert_num1,vert_num2)
                     
 def kick_to_adj(graph,abst_type):
@@ -84,13 +104,15 @@ def kick_to_adj(graph,abst_type):
         vert_num = graph['scope']
 
     elif abst_type ==1:
-        graph['adj'][graph['scope']+1][graph['scope']+2] =1
+        edge = [graph['scope']+1,graph['scope']+2]
+        SimMC.color_red(edge,graph['graph_rep'],graph['red_edges'])
         add_edge(graph,graph['scope']+1,graph['scope']+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
-        graph['adj'][graph['scope']+1][graph['scope']+2] =-1
+        edge = [graph['scope']+1,graph['scope']+2]
+        SimMC.color_blue(edge,graph['graph_rep'],graph['blue_edges'])
         add_edge(graph,graph['scope']+1,graph['scope']+2,True)
         graph['scope']+=2
         vert_num = graph['scope']-1
@@ -104,7 +126,8 @@ def update_real_abst(graph,real_coords,abst_type):
     abstract catagories are added, plus this is how the others are done'''
     graph['abst'][abst_type] -=1
     vert_num = kick_to_adj(graph,abst_type)
-    graph['adj'][real_coords][vert_num] = 1
+    edge = [real_coords,vert_num]
+    SimMC.color_blue(edge,graph['graph_rep'],graph['red_edges'])
     add_edge(graph,real_coords,vert_num)
         
 def get_edge(graph,n,m):
