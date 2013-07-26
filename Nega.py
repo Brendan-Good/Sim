@@ -1,7 +1,7 @@
 def Nega(graph):
     '''Nega function for graph'''
-    for s in range(0,graph['scope']):    #Switches red edges and blue edges for the adjacency matrix
-        for t in range(s,graph['scope']):
+    for s in range(0,graph['scope']+1):    #Switches red edges and blue edges for the adjacency matrix
+        for t in range(s,graph['scope']+1):
             if graph['adj'][s][t]==1:
                 graph['adj'][s][t]=-1
             elif graph['adj'][s][t]==-1:

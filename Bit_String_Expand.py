@@ -2,11 +2,10 @@
 
 import copy
 import is_terminal
-import SimMC
+import SimMCTest
 from bitstring import BitArray
 
 def Test_Expand():
-    adj = [[0 for col in range(6)] for row in range(6)]
     abst = [6,0,0]
     tuples = is_terminal.generate_structure(6,3)
     scope = -1
@@ -14,7 +13,9 @@ def Test_Expand():
     turn_number = 1
     game_over = False
     graph_rep = 30*BitArray(bin='0')
-    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep}
+    red_edges = []
+    blue_edges = []
+    graph = {'tuples':tuples,'abst':abst,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep,'red_edges':red_edges,'blue_edges':blue_edges}
     
     return Expand(graph)
 
@@ -57,7 +58,7 @@ def Expand(graph):
             if get_edge(graph,real_num,real_num2) == 0:
                 new_graph = layer_update(graph)
                 edge = [real_num,real_num2]
-                SimMC.color_red(edge,new_graph['graph_rep'],new_graph['red_edges'])
+                SimMCTest.color_red(edge,new_graph['graph_rep'],new_graph['red_edges'])
                 add_edge(new_graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
           
@@ -89,7 +90,7 @@ def update_abst_nodes(graph,cat1,cat2):
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_adj(graph,cat2)
         edge = [vert_num1,vert_num2]
-        SimMC.color_red(edge,graph['graph_rep'],graph['red_edges'])
+        SimMCTest.color_red(edge,graph['graph_rep'],graph['red_edges'])
         add_edge(graph,vert_num1,vert_num2)
                     
 def kick_to_adj(graph,abst_type):
@@ -105,14 +106,14 @@ def kick_to_adj(graph,abst_type):
 
     elif abst_type ==1:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMC.color_red(edge,graph['graph_rep'],graph['red_edges'])
+        SimMCTest.color_red(edge,graph['graph_rep'],graph['red_edges'])
         add_edge(graph,graph['scope']+1,graph['scope']+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMC.color_blue(edge,graph['graph_rep'],graph['blue_edges'])
+        SimMCTest.color_blue(edge,graph['graph_rep'],graph['blue_edges'])
         add_edge(graph,graph['scope']+1,graph['scope']+2,True)
         graph['scope']+=2
         vert_num = graph['scope']-1
@@ -127,7 +128,7 @@ def update_real_abst(graph,real_coords,abst_type):
     graph['abst'][abst_type] -=1
     vert_num = kick_to_adj(graph,abst_type)
     edge = [real_coords,vert_num]
-    SimMC.color_blue(edge,graph['graph_rep'],graph['red_edges'])
+    SimMCTest.color_blue(edge,graph['graph_rep'],graph['red_edges'])
     add_edge(graph,real_coords,vert_num)
         
 def get_edge(graph,n,m):
