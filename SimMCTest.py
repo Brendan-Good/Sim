@@ -35,6 +35,8 @@ blue_edges = []
 
 max_iterations = 10000
 
+random_games = 100
+
 total_runs = 0
 
 def monte_carlo(max_iterations,node=root):
@@ -64,7 +66,7 @@ def value(node):
     value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
     return value
 
-#I actually do not want to expand, but to 
+#I actually do not want to expand, but to just play a random game until it's over.
 def play_random(node,player_turn,):
     original_node=node
     while(not is_terminal(Edges_to_Check,turn_number)):
@@ -83,7 +85,8 @@ def color_red(edge,graph_rep):
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
     graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
     global red_edges
-    red_edges.append(edge)
+    copy.deepcopy(red_edges)
+    .append(edge)
     return graph_rep 
     
 def color_blue(edge,graph_rep):
@@ -108,12 +111,16 @@ def is_terminal(Edge,Edges_to_Check,turn_number):
 # If this is less than l-1, then no. else, 
 
 def check_win(Edge,Edges_to_Check):
+    '''
+    takes in the edge just colored and all edges of that color and checks to see if that satisfies the condition for a win.
+    Example: [x,y] colored blue. check_win takes[x,y] and all of the blue_edges as input.
+    '''
     colored_list = [[Edge[0],Edge[1]]]
     stored_vertices = []
-    if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):
+    if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):#If there aren't enough edges of the same color as our edge, then false.
         return False
     else:
-        for edges in Edges_to_Check:
+        for edges in Edges_to_Check:#If any of our edges in Edges_to_Check has Edge[0] as an endpoint, add the other endpoint to our list of stored vertices
             if(edges==Edge):
                 continue
             if(edges[0] == Edge[0]):
@@ -128,7 +135,7 @@ def check_win(Edge,Edges_to_Check):
         if(len(colored_list)<win_subgraph-1):
             return False
         else:
-            l_minus_2_combinations = list(itertools.combinations(stored_vertices,win_subgraph-2))
+            l_minus_2_combinations = list(itertools.combinations(stored_vertices,win_subgraph-2))#create an l-2 combination of the stored vertices (we omit the two endpoints of Edge as it is guaranteed to be in a k_l if Edge forms a new k_l)
             iterator = 0
             for combinations in range(len(l_minus_2_combinations)):
                 l_minus_2_combinations[combinations]=list(l_minus_2_combinations[combinations])
@@ -136,7 +143,7 @@ def check_win(Edge,Edges_to_Check):
                 l_minus_2_combinations[combinations].append(Edge[1])
                 print(l_minus_2_combinations,"l-2 combinations")
                 potential_kl = []
-                for x in range(win_subgraph-1):
+                for x in range(win_subgraph-1):#For every combination, check if every vertex is connected to every other vertex.
                     for y in range(x+1,win_subgraph):
                         if(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]) in Edges_to_Check):
                             potential_kl.append(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]))
@@ -149,29 +156,15 @@ def check_win(Edge,Edges_to_Check):
             if(iterator==len(l_minus_2_combinations)):
                 return False
                         
-                        
-            #Edges_to_Check_0 = set()
-            #for x in range(len(stored_vertices)-1):
-            #    for y in range(x,len(stored_vertices)):
-            #        if(connect(stored_vertices[x],stored_vertices[y]) in Edges_to_Check):
-            #            Edges_to_Check_0 = Edges_to_Check_0|connect(stored_vertices[x],stored_vertices[y])
-            #print(Edges_to_Check_0)
-            #potential_kl=list(itertools.combinations(Edges_to_Check_0, win_subgraph-2))
-            #if():
-            #    return False
-            #else:
-            #    return True
-                        
 def connect(vertex1,vertex2):
     edge = [min(vertex1,vertex2),max(vertex1,vertex2)]
-    return edge            
+    return edge #return the edge connecting vertex1 and vertex2           
 
 def get_edges(turns):
     if(turns%2==1):
         return red_edges
     else:
         return blue_edges
-        
 
-#The following two lines are to see if the code works as expected.
+#The following line(s) is/are to see if the code works as expected.
 print(Graph_Rep.bin)
