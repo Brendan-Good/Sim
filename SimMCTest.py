@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #TO DO! Make sure the statistics are passed up correctly (sign flipping? I have not done that yet).  
+#In Bit_String_Expand, use the kick_to_graph as an "unabstractor".
 from bitstring import BitArray 
 import sys 
 import random
@@ -12,7 +13,7 @@ Graph_Size = 18
 
 win_subgraph = 4
 
-Graph_Rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
+graph_rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
 #each edge is uncolored
 
 class Node:
@@ -33,11 +34,15 @@ red_edges = []
 
 blue_edges = []
 
+blank_edges = 
+
 max_iterations = 10000
 
 random_games = 100
 
 total_runs = 0
+
+graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, 'blue_edges':blue_edges,'blank_edges':blank_edges}
 
 def monte_carlo(max_iterations,node=root):
     while node.children != [] or max_iterations > 0:
@@ -76,18 +81,18 @@ def play_random(node,player_turn,):
     if(player_turn%2==1):
         original_node.wins+=1
 
-def color_red(edge,graph_rep):
+def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
-    graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
+    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]] = False
+    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]] = True
     global red_edges
-    copy.deepcopy(red_edges)
-    .append(edge)
-    return graph_rep 
+    graph['red_edges'] = copy.deepcopy(red_edges)
+    graph['red_edges'].append(edge)
+    return graph
     
 def color_blue(edge,graph_rep):
     ''' Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 01 which 
@@ -96,11 +101,12 @@ def color_blue(edge,graph_rep):
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
-    graph_rep[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
+    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]] = False
+    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]] = True
     global blue_edges
-    blue_edges.append(edge)
-    return graph_rep
+    graph['blue_edges'] = copy.deepcopy(blue_edges)
+    graph['blue_edges'].append(edge)
+    return graph
 
 def is_terminal(Edge,Edges_to_Check,turn_number):
     if(turn_number==(n*(n-1))/2 or check_win(Edge,Edges_to_Check)):
