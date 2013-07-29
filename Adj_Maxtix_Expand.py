@@ -47,7 +47,6 @@ def Expand(graph):
 def layer_update(graph):
     new_graph = copy.deepcopy(graph)
     #new_graph['depth']+=1 currently unnecessary 
-    new_graph['turn_number']+=1
     return new_graph
 
 def add_edge(graph,n,m,wrong_turn = False):

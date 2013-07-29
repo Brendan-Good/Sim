@@ -8,7 +8,7 @@ import is_terminal
 import Nega
 
 from collections import deque
-from copy import deepcopy
+import copy
 
 MAX_DEPTH = 15
 nodes_visited = 0
@@ -25,10 +25,50 @@ def test_is_terminal():
     qa3 = ter.is_terminal(tuples,[1,2],2)
     return [re1,re2,re3,qa1,qa2,qa3]
 
+def display_graph(graph):
+    display = ""
+    dis = "   "
+    
+    for x in range(len(graph['adj'])):
+        dis += str(x)
+        dis += " "
+    print(dis)
+    print(" ")
+    for x in range(len(graph['adj'])):
+        display+=str(x)
+        display+=" "
+        for y in range(len(graph['adj'][x])):
+            if graph['adj'][x][y] != -1:
+                display+=" "
+            display+=str(graph['adj'][x][y])
+        print(display) 
+        display = ""
+
+def display_graph_b(graph,size):
+    display = ""
+    dis = "   "
+    
+    for x in range(0,size):
+        dis += str(x)
+        dis += " "
+    print(dis)
+    print(" ")
+    for x in range(0,size):
+        display+=str(x)
+        display+=" "
+        for y in range(0,size):
+            if Adj_Maxtix_Expand.get_edge(graph,x,y):
+                display+=" "
+            display+=str(graph['adj'][x][y])
+        print(display) 
+        display = ""
+
+
+
 def play_game():
-    adj = [[0 for col in range(6)] for row in range(6)]
-    abst = [6,0,0]
-    tuples = is_terminal.generate_structure(6,3)
+    adj = [[0 for col in range(5)] for row in range(5)]
+    abst = [5,0,0]
+    tuples = is_terminal.generate_structure(5,3)
     scope = -1
     depth = 15
     turn_number = 1
@@ -38,12 +78,20 @@ def play_game():
     while not game_over:
         graph = negamax(graph,-1 * inf, inf ,1,15)[0]
         print(graph['abst']," abst ")
-        print(graph['adj']," adj ") 
-        #print(graph['scope']," scope ")
-        print(graph['turn_number']," turn_number ")
-        #print(graph['tuples']," tuples ",)
-        Nega.Nega(graph)
+        graph['adj'][1][2]=-1
+        display_graph(graph)
+        print(graph['adj'])
+        print(graph['game_over'], "game over")
+        
         game_over = graph['game_over']
+        if not game_over:
+            vert1 = int(input('player turn:'))
+            vert2 = int(input('player turn:'))
+            graph['adj'][vert1][vert2]=-1
+            graph['scope']+=2
+            graph['abst'][0]-=2
+            display_graph(graph)
+
     print("nodes visited = ", nodes_visited)
 
 
@@ -68,9 +116,11 @@ def negamax(node, alpha, beta, player, depth):
     else:
         candidate_move = None
         for move in Adj_Maxtix_Expand.Expand(node):
-            Nega.Nega(move)
-            val = -1 * negamax(move, -1 * alpha, -1 * beta, -1 * player, depth - 1 )[1]
-            Nega.Nega(move)
+            new_move = copy.deepcopy(move)
+            new_move['turn_number']+=1
+            Nega.Nega(new_move)   
+            val = -1 * negamax(new_move, -1 * alpha, -1 * beta, -1 * player, depth - 1 )[1]
+            
             if val >= beta:
                 return (move, val)
             if val > alpha:
@@ -90,3 +140,5 @@ def move_extractor(changed_graph,unchanged_graph):
         location += -1
 
     return location
+
+

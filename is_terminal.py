@@ -6,7 +6,7 @@ import itertools
 
 end_condition = 3
 
-graph_size = 6
+graph_size = 5
 
 vertices_set=set(range(graph_size))
 

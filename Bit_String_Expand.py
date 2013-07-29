@@ -25,7 +25,6 @@ def Expand(graph):
     of nodes with no colored edges, 1 is the number of isolated red edges, 2 is the
     number of isolated green/blue/2nd edges. Returns a list of graphs after
     distinct moves with an attached list of metadata (abstract node numbers).
-    adapt to work with BitArray?
 
     add_edge should probably be update_structure
     
@@ -86,14 +85,14 @@ def update_abst_nodes(graph,cat1,cat2):
         graph['abst'][1]+=1
     else:
         graph['abst'][cat1]-=1
-        vert_num1 = kick_to_adj(graph,cat1) 
+        vert_num1 = kick_to_graph(graph,cat1) 
         graph['abst'][cat2]-=1
-        vert_num2 = kick_to_adj(graph,cat2)
+        vert_num2 = kick_to_graph(graph,cat2)
         edge = [vert_num1,vert_num2]
         SimMCTest.color_red(edge,graph['graph_rep'],graph['red_edges'])
         add_edge(graph,vert_num1,vert_num2)
                     
-def kick_to_adj(graph,abst_type):
+def kick_to_graph(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
     of that abstract structure to the adj matrix.
     returns vert number of the first node kicked.
@@ -122,11 +121,18 @@ def kick_to_adj(graph,abst_type):
 
     return vert_num
 
+def kick_all(graph):
+    while graph['abst'][1]!= 0:
+        kick_to_graph(graph,1)
+    while graph['abst'][2]!= 0:
+        kick_to_graph(graph,2)
+
+
 def update_real_abst(graph,real_coords,abst_type):
     '''This function could probably be inline as is, but it may grow if more
     abstract catagories are added, plus this is how the others are done'''
     graph['abst'][abst_type] -=1
-    vert_num = kick_to_adj(graph,abst_type)
+    vert_num = kick_to_graph(graph,abst_type)
     edge = [real_coords,vert_num]
     SimMCTest.color_blue(edge,graph['graph_rep'],graph['red_edges'])
     add_edge(graph,real_coords,vert_num)
