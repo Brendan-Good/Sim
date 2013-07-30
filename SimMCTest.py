@@ -7,7 +7,7 @@ import random
 import math
 import copy
 import itertools
-import Adj_Maxtix_Expand
+import Bit_String_Expand
 
 Graph_Size = 18
 
@@ -26,7 +26,6 @@ class Node:
         self.value = value
         self.board = board
 
-root = Node([],[],0,0,0,Graph_Rep)
 
 total_runs = 0
 
@@ -36,6 +35,10 @@ blue_edges = []
 
 blank_edges = []
 
+for x in range(Graph_Size-1):
+    for y in range(x+1,Graph_Size):
+        blank_edges.append([x,y])
+
 max_iterations = 10000
 
 random_games = 100
@@ -44,10 +47,12 @@ total_runs = 0
 
 graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, 'blue_edges':blue_edges,'blank_edges':blank_edges}
 
+root = Node([],[],0,0,0,graph)
+
 def monte_carlo(max_iterations,node=root):
     while node.children != [] or max_iterations > 0:
         node = best_child(node)
-    for boards in Adj_Maxtix_Expand.Expand(best_child(node)):
+    for boards in Bit_String_Expand.Expand(best_child(node)):
         node.append(Node(node,[],0,0,float('inf'),boards))
 
 def update_statistics(node,value):
@@ -77,8 +82,8 @@ def play_random(node,graph,player_turn,):
     while True:
         if(player_turn%2 == 1):
             if(not check_win(graph['blue_edges'],turn_number)):
-                color_red(random.choice(graph['blank_edges'])
-                player_turn+=1
+                color_red(random.choice(graph['blank_edges']))
+                player_turn += 1
             else:
                 return node
         if(player_turn%2 == 0):
@@ -181,4 +186,4 @@ def get_edges(turns):
         return blue_edges
 
 #The following line(s) is/are to see if the code works as expected.
-print(Graph_Rep.bin)
+print(graph['graph_rep'].bin)
