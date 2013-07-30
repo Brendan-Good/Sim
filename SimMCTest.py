@@ -59,7 +59,7 @@ def update_statistics(node,value):
     return node
 
 def iterative_update(node):
-    while(node!=root):
+    while node!=root:
         node = node.parent
         for children in node.children:
             node.value = (children.runs/total_runs)*children.value
@@ -74,7 +74,7 @@ def value(node):
 #I actually do not want to expand, but to just play a random game until it's over.
 def play_random(node,graph,player_turn,):
     node.runs += 1
-    while(True):
+    while True:
         if(player_turn%2 == 1):
             if(not check_win(graph['blue_edges'],turn_number)):
                 color_red(random.choice(graph['blank_edges'])
