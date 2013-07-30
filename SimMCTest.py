@@ -34,7 +34,7 @@ red_edges = []
 
 blue_edges = []
 
-blank_edges = 
+blank_edges = []
 
 max_iterations = 10000
 
@@ -72,12 +72,11 @@ def value(node):
     return value
 
 #I actually do not want to expand, but to just play a random game until it's over.
-def play_random(node,player_turn,):
-    original_node=node
-    while(not is_terminal(Edges_to_Check,turn_number)):
-        expand(node)
-        node = random.choice(node.children)
-        player_turn+=1
+def play_random(node,graph,player_turn,):
+    if(player_turn%2 == 1):
+        while(not check_win(Edges_to_Check,turn_number)):
+             color_red(random.choice(graph['blank_edges'])
+            player_turn+=1
     if(player_turn%2==1):
         original_node.wins+=1
 
