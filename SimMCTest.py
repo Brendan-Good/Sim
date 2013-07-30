@@ -47,18 +47,18 @@ graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, '
 def monte_carlo(max_iterations,node=root):
     while node.children != [] or max_iterations > 0:
         node = best_child(node)
-        for boards in Adj_Maxtix_Expand.Expand(best_child(node)):
-            node.append(Node(node,[],0,0,float('inf'),boards))
+    for boards in Adj_Maxtix_Expand.Expand(best_child(node)):
+        node.append(Node(node,[],0,0,float('inf'),boards))
 
 def update_statistics(node,value):
     node.runs += 1
     global total_runs
     total_runs += 1
     node.value = (node.wins+value)/node.runs
-    recursive_update(node)
+    iterative_update(node)
     return node
 
-def recursive_update(node):
+def iterative_update(node):
     while(node!=root):
         node = node.parent
         for children in node.children:
@@ -73,12 +73,21 @@ def value(node):
 
 #I actually do not want to expand, but to just play a random game until it's over.
 def play_random(node,graph,player_turn,):
-    if(player_turn%2 == 1):
-        while(not check_win(Edges_to_Check,turn_number)):
-             color_red(random.choice(graph['blank_edges'])
-            player_turn+=1
-    if(player_turn%2==1):
-        original_node.wins+=1
+    node.runs += 1
+    while(True):
+        if(player_turn%2 == 1):
+            if(not check_win(graph['blue_edges'],turn_number)):
+                color_red(random.choice(graph['blank_edges'])
+                player_turn+=1
+            else:
+                return node
+        if(player_turn%2 == 0):
+            if(not check_win(graph['red_edges'],turn_number)):    
+                color_blue(random.choice(graph['blank_edges']))
+                player_turn+=1
+            else:
+                node.wins += 1
+                return node 
 
 def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
