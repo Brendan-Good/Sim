@@ -26,7 +26,6 @@ class Node:
         self.value = value
         self.board = board
 
-
 total_runs = 0
 
 red_edges = []
@@ -52,8 +51,11 @@ root = Node([],[],0,0,0,graph)
 def monte_carlo(max_iterations,node=root):
     while node.children != [] or max_iterations > 0:
         node = best_child(node)
+        max_iterations -= 1
     for boards in Bit_String_Expand.Expand(best_child(node)):
-        node.append(Node(node,[],0,0,float('inf'),boards))
+        (node.children).append(Node(node,[],0,0,float('inf'),boards))
+    for nodes in node.children:
+        play_random(nodes)
 
 def update_statistics(node,value):
     node.runs += 1
@@ -85,13 +87,14 @@ def play_random(node,graph,player_turn,):
                 color_red(random.choice(graph['blank_edges']))
                 player_turn += 1
             else:
+                update_statistics(node,0)
                 return node
         if(player_turn%2 == 0):
             if(not check_win(graph['red_edges'],turn_number)):    
                 color_blue(random.choice(graph['blank_edges']))
                 player_turn+=1
             else:
-                node.wins += 1
+                update_statistics(node,1)
                 return node 
 
 def color_red(edge,graph):
