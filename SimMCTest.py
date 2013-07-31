@@ -78,24 +78,26 @@ def value(node):
     value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
     return value
 
-#I actually do not want to expand, but to just play a random game until it's over.
 def play_random(node,graph,player_turn,):
     node.runs += 1
-    while True:
-        if(player_turn%2 == 1):
-            if(not check_win(graph['blue_edges'],turn_number)):
-                color_red(random.choice(graph['blank_edges']))
-                player_turn += 1
-            else:
-                update_statistics(node,0)
-                return node
-        if(player_turn%2 == 0):
-            if(not check_win(graph['red_edges'],turn_number)):    
-                color_blue(random.choice(graph['blank_edges']))
-                player_turn+=1
-            else:
-                update_statistics(node,1)
-                return node 
+    random_games_here = 100 
+    while random_game_here > 0:
+        while True:
+            if(player_turn%2 == 1):
+                if(not check_win(graph['blue_edges'],turn_number)):
+                    color_red(random.choice(graph['blank_edges']))
+                    player_turn += 1
+                else:
+                    node = update_statistics(node,0)
+                    break
+            if(player_turn%2 == 0):
+                if(not check_win(graph['red_edges'],turn_number)):    
+                    color_blue(random.choice(graph['blank_edges']))
+                    player_turn+=1
+                else:
+                    node = update_statistics(node,1)
+                    break
+        random_game_here -= 1
 
 def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
