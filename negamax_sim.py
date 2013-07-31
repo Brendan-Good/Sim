@@ -22,7 +22,7 @@ def test_is_terminal():
     re3 = ter.is_terminal(tuples,[1,2],1)
     qa1 = ter.is_terminal(tuples,[3,4],2)
     qa2 = ter.is_terminal(tuples,[3,5],2)
-    qa3 = ter.is_terminal(tuples,[1,2],2)
+    qa3 = ter.is_terminal(tuples,[4,5],2)
     return [re1,re2,re3,qa1,qa2,qa3]
 
 def display_graph(graph):
@@ -77,20 +77,20 @@ def play_game():
 
     while not game_over:
         graph = negamax(graph,-1 * inf, inf ,1,15)[0]
+        
         print(graph['abst']," abst ")
-        graph['adj'][1][2]=-1
         display_graph(graph)
         print(graph['adj'])
         print(graph['game_over'], "game over")
-        
+        Nega.Nega(graph)
         game_over = graph['game_over']
-        if not game_over:
-            vert1 = int(input('player turn:'))
-            vert2 = int(input('player turn:'))
-            graph['adj'][vert1][vert2]=-1
-            graph['scope']+=2
-            graph['abst'][0]-=2
-            display_graph(graph)
+        #if not game_over:
+        #    vert1 = int(input('player turn:'))
+        #    vert2 = int(input('player turn:'))
+        #    graph['adj'][vert1][vert2]=-1
+        #    graph['scope']+=2
+        #    graph['abst'][0]-=2
+        #    display_graph(graph)
 
     print("nodes visited = ", nodes_visited)
 
