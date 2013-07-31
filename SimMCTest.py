@@ -7,7 +7,7 @@ import random
 import math
 import copy
 import itertools
-import Adj_Maxtix_Expand
+import Bit_String_Expand
 
 Graph_Size = 18
 
@@ -26,15 +26,17 @@ class Node:
         self.value = value
         self.board = board
 
-root = Node([],[],0,0,0,Graph_Rep)
-
 total_runs = 0
 
 red_edges = []
 
 blue_edges = []
 
-blank_edges = 
+blank_edges = []
+
+for x in range(Graph_Size-1):
+    for y in range(x+1,Graph_Size):
+        blank_edges.append([x,y])
 
 max_iterations = 10000
 
@@ -44,22 +46,27 @@ total_runs = 0
 
 graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, 'blue_edges':blue_edges,'blank_edges':blank_edges}
 
+root = Node([],[],0,0,0,graph)
+
 def monte_carlo(max_iterations,node=root):
     while node.children != [] or max_iterations > 0:
         node = best_child(node)
-        for boards in Adj_Maxtix_Expand.Expand(best_child(node)):
-            node.append(Node(node,[],0,0,float('inf'),boards))
+        max_iterations -= 1
+    for boards in Bit_String_Expand.Expand(best_child(node)):
+        (node.children).append(Node(node,[],0,0,float('inf'),boards))
+    for nodes in node.children:
+        play_random(nodes)
 
 def update_statistics(node,value):
     node.runs += 1
     global total_runs
     total_runs += 1
     node.value = (node.wins+value)/node.runs
-    recursive_update(node)
+    iterative_update(node)
     return node
 
-def recursive_update(node):
-    while(node!=root):
+def iterative_update(node):
+    while node!=root:
         node = node.parent
         for children in node.children:
             node.value = (children.runs/total_runs)*children.value
@@ -72,14 +79,23 @@ def value(node):
     return value
 
 #I actually do not want to expand, but to just play a random game until it's over.
-def play_random(node,player_turn,):
-    original_node=node
-    while(not is_terminal(Edges_to_Check,turn_number)):
-        expand(node)
-        node = random.choice(node.children)
-        player_turn+=1
-    if(player_turn%2==1):
-        original_node.wins+=1
+def play_random(node,graph,player_turn,):
+    node.runs += 1
+    while True:
+        if(player_turn%2 == 1):
+            if(not check_win(graph['blue_edges'],turn_number)):
+                color_red(random.choice(graph['blank_edges']))
+                player_turn += 1
+            else:
+                update_statistics(node,0)
+                return node
+        if(player_turn%2 == 0):
+            if(not check_win(graph['red_edges'],turn_number)):    
+                color_blue(random.choice(graph['blank_edges']))
+                player_turn+=1
+            else:
+                update_statistics(node,1)
+                return node 
 
 def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
@@ -173,4 +189,4 @@ def get_edges(turns):
         return blue_edges
 
 #The following line(s) is/are to see if the code works as expected.
-print(Graph_Rep.bin)
+print(graph['graph_rep'].bin)
