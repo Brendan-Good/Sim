@@ -9,9 +9,9 @@ import copy
 import itertools
 import Bit_String_Expand
 
-Graph_Size = 18
+Graph_Size = 6
 
-win_subgraph = 4
+win_subgraph = 3
 
 graph_rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
 #each edge is uncolored
@@ -26,8 +26,6 @@ class Node:
         self.value = value
         self.board = board
 
-total_runs = 0
-
 red_edges = []
 
 blue_edges = []
@@ -38,24 +36,33 @@ for x in range(Graph_Size-1):
     for y in range(x+1,Graph_Size):
         blank_edges.append([x,y])
 
+abst = [18,0,0]
+
+scope = -1
+
 max_iterations = 10000
 
-random_games = 100
+total_runs = 1
 
-total_runs = 0
+turn_number = 1
 
-graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, 'blue_edges':blue_edges,'blank_edges':blank_edges}
+last_random_blue = []
+
+last_random_red = []
+
+graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, 'blue_edges':blue_edges,'blank_edges':blank_edges,'abst':abst, 'scope':scope, 'turn_number':turn_number}
 
 root = Node([],[],0,0,0,graph)
 
-def monte_carlo(max_iterations,node=root):
-    while node.children != [] or max_iterations > 0:
+def monte_carlo(max_iterations=10000,node=root):
+    while node.children != []:
         node = best_child(node)
         max_iterations -= 1
-    for boards in Bit_String_Expand.Expand(best_child(node)):
+    for boards in Bit_String_Expand.Expand(node.board):
         (node.children).append(Node(node,[],0,0,float('inf'),boards))
     for nodes in node.children:
-        play_random(nodes)
+        play_random(nodes,nodes.board,nodes.board['turn_number'],)
+    monte_carlo(10000,best_child(node))
 
 def update_statistics(node,value):
     node.runs += 1
@@ -75,56 +82,110 @@ def best_child(node):
     return max(node.children,key=value)
 
 def value(node):
-    value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
+    if(node.runs == 0):
+        value = float('inf')
+    else:
+        value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
     return value
 
 def play_random(node,graph,player_turn,):
+    last_random_red = []
+    last_random_blue = []
     node.runs += 1
-    random_games_here = 100 
-    while random_game_here > 0:
+    random_games = 1 
+    original_graph = graph
+    while random_games > 0:
+        graph = original_graph
         while True:
             if(player_turn%2 == 1):
-                if(not check_win(graph['blue_edges'],turn_number)):
-                    color_red(random.choice(graph['blank_edges']))
+                if(last_random_blue==[]):
+                    last_random_red = random.choice(graph['blank_edges'])
+                    last_graph = color_red(last_random_red,graph)
                     player_turn += 1
+                    continue
+                elif(not check_win(last_random_blue,last_graph['blue_edges'])):
+                    last_random_red = random.choice(last_graph['blank_edges'])
+                    last_graph = color_red(last_random_red,last_graph)
+                    player_turn += 1
+                    continue
                 else:
                     node = update_statistics(node,0)
-                    break
+                    print("Random game has been played!")
+                    break#I'm definitely going to have to change this later
             if(player_turn%2 == 0):
-                if(not check_win(graph['red_edges'],turn_number)):    
-                    color_blue(random.choice(graph['blank_edges']))
+                if(last_random_red==[]):
+                    last_random_blue = random.choice(graph['blank_edges'])
+                    last_graph = color_blue(last_random_blue,graph)
                     player_turn+=1
+                    continue
+                elif(not check_win(last_random_red,last_graph['red_edges'])):    
+                    last_random_blue = random.choice(last_graph['blank_edges'])
+                    last_graph = color_blue(last_random_blue,last_graph)
+                    print(last_graph)
+                    player_turn+=1
+                    continue
                 else:
                     node = update_statistics(node,1)
-                    break
-        random_game_here -= 1
+                    print("Random game has been played!")
+                    break#this too
+        random_games -= 1
+        print("random_games has been decremented")
 
 def color_red(edge,graph):
+    #Ohhhhhhhhhhhhhhhh! I am copying the global variable red_edges which is blank!
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]] = False
-    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]] = True
-    global red_edges
-    graph['red_edges'] = copy.deepcopy(red_edges)
-    graph['red_edges'].append(edge)
-    return graph
+    #original_edges = graph['red_edges']
+    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
+    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
+    #graph['red_edges'] = copy.deepcopy(red_edges)
+    #graph['red_edges'].append(edge)
+    #graph['blank_edges'] = copy.deepcopy(blank_edges)
+    #graph['blank_edges'].remove(edge)
+    #intermediate_edges = copy.deepcopy(red_edges)
+    #intermediate_edges.append(edge)
+    #return graph
+    print("input for coloring red:")
+    print(graph['red_edges'],"red")
+    print(graph['blue_edges'],"blue")
+    intermediate_graph = copy.deepcopy(graph)
+    intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
+    intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
+    intermediate_graph['red_edges'].append(edge)
+    intermediate_graph['blank_edges'].remove(edge)
+    print("just colored red:")
+    print(intermediate_graph['red_edges'])
+    return copy.copy(intermediate_graph)
     
-def color_blue(edge,graph_rep):
+    
+    
+def color_blue(edge,graph):
     ''' Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 01 which 
     will be our convention for saying an edge is blue.  ''' 
-
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]] = False
-    graph['graph_rep'[2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]] = True
-    global blue_edges
-    graph['blue_edges'] = copy.deepcopy(blue_edges)
-    graph['blue_edges'].append(edge)
-    return graph
+    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
+    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
+    #graph['blue_edges'] = copy.deepcopy(blue_edges)
+    #graph['blue_edges'].append(edge)
+    #graph['blank_edges'] = copy.deepcopy(blank_edges)
+    #graph['blank_edges'].remove(edge)
+    #return graph
+    print("input for coloring blue:")
+    print(graph['blue_edges'],"blue")
+    print(graph['red_edges'],"red")
+    intermediate_graph = copy.deepcopy(graph)
+    intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
+    intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
+    intermediate_graph['blue_edges'].append(edge)
+    intermediate_graph['blank_edges'].remove(edge)
+    print("just colored blue:")
+    print(intermediate_graph['blue_edges'])
+    return copy.copy(intermediate_graph)
 
 def is_terminal(Edge,Edges_to_Check,turn_number):
     if(turn_number==(n*(n-1))/2 or check_win(Edge,Edges_to_Check)):
@@ -142,6 +203,7 @@ def check_win(Edge,Edges_to_Check):
     colored_list = [[Edge[0],Edge[1]]]
     stored_vertices = []
     if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):#If there aren't enough edges of the same color as our edge, then false.
+        print(Edges_to_Check,"Edges_to_Check")
         return False
     else:
         for edges in Edges_to_Check:#If any of our edges in Edges_to_Check has Edge[0] as an endpoint, add the other endpoint to our list of stored vertices
