@@ -130,3 +130,12 @@ def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
     edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
     return edge_bit1,edge_bit2
+
+def color(edge,graph):
+    if(graph['turn_number']%2==1):
+        color_red(edge,graph)
+    else:
+        color_blue(edge,graph)
+
+
+    
