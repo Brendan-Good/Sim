@@ -6,13 +6,15 @@ import SimMCTest
 from bitstring import BitArray
 
 def Test_Expand():
-    abst = [6,0,0]
-    tuples = is_terminal.generate_structure(6,3)
+    n = 6
+    l = 3
+    abst = [n,0,0]
+    tuples = is_terminal.generate_structure(n,l)
     scope = -1
     depth = 15
     turn_number = 1
     game_over = False
-    graph_rep = 30*BitArray(bin='0')
+    graph_rep = n*(n-1)1BitArray(bin='0')
     red_edges = []
     blue_edges = []
     graph = {'tuples':tuples,'abst':abst,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep,'red_edges':red_edges,'blue_edges':blue_edges}

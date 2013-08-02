@@ -3,6 +3,13 @@
 import copy
 import is_terminal
 
+def set_play_num(graph):
+    play_num = "all is lost"
+    if graph['turn_num']%2 == 1:
+        return 1
+    else:
+        return -1
+
 def Expand(graph):
     ''' Takes in a graph dictionary and returns a list of all possible graphs
     after taking one move. abstract node types in graph["abst"]: 0 is the number
@@ -15,10 +22,10 @@ def Expand(graph):
     graph['adj']: full size, all zeros
     graph['abst']: graph['abst'][0]= number of nodes
     graph['scope']: -1
-    graph['play_num']
+    graph['turn_num']
     graph['depth']: 1'''
     
-
+    play_num = set_play_num(graph)
     child_graphs = []
     new_graph = []
     
@@ -40,7 +47,7 @@ def Expand(graph):
         for real_num2 in range(real_num+1,graph['scope']+1):
             if graph['adj'][real_num][real_num2] == 0:
                 new_graph = layer_update(graph)
-                new_graph['adj'][real_num][real_num2]= graph['play_num']
+                new_graph['adj'][real_num][real_num2]= play_num
                 add_edge(new_graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
           
@@ -58,10 +65,12 @@ def add_edge(graph,n,m):
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
     non-abstract nodes to the adj matrix '''
+    
+    play_num = set_play_num(graph)
 
     if cat1 == 0 and cat2 == 0:
         graph['abst'][0]-=2
-        if graph['play_num']==1:
+        if play_num==1:
             graph['abst'][1]+=1
         else:
             graph['abst'][2]+=1
@@ -70,7 +79,7 @@ def update_abst_nodes(graph,cat1,cat2):
         vert_num1 = kick_to_adj(graph,cat1) 
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_adj(graph,cat2)
-        graph['adj'][vert_num1][vert_num2] = graph['play_num']
+        graph['adj'][vert_num1][vert_num2] = play_num
         add_edge(graph,vert_num1,vert_num2)
                     
 def kick_to_adj(graph,abst_type):
@@ -85,14 +94,14 @@ def kick_to_adj(graph,abst_type):
         vert_num = graph['scope']
 
     elif abst_type ==1:
-        graph['adj'][graph['scope']+1][graph['scope']+2] =1
+        graph['adj'][graph['scope']+1][graph['scope']+2] = 1
         add_edge(graph,graph['scope']+1,graph['scope']+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         graph['adj'][graph['scope']+1][graph['scope']+2] =-1
-        add_edge(graph,graph['scope']+1,graph['scope']+2,True)
+        add_edge(graph,graph['scope']+1,graph['scope']+2)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
@@ -103,9 +112,10 @@ def kick_to_adj(graph,abst_type):
 def update_real_abst(graph,real_coords,abst_type):
     '''This function could probably be inline as is, but it may grow if more
     abstract catagories are added, plus this is how the others are done'''
+    play_num = set_play_num(graph)
     graph['abst'][abst_type] -=1
     vert_num = kick_to_adj(graph,abst_type)
-    graph['adj'][real_coords][vert_num] = graph['play_num']
+    graph['adj'][real_coords][vert_num] = play_num
     add_edge(graph,real_coords,vert_num)
         
 def get_edge(graph,n,m):
