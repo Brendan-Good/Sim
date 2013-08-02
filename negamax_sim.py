@@ -45,6 +45,7 @@ def display_graph(graph):
         display = ""
 
 def display_graph_b(graph,size):
+    ''' takes in graph followed by the size of the graph'''
     display = ""
     dis = "   "
     
@@ -57,12 +58,15 @@ def display_graph_b(graph,size):
         display+=str(x)
         display+=" "
         for y in range(0,size):
-            if Adj_Maxtix_Expand.get_edge(graph,x,y):
+            if Adj_Maxtix_Expand.get_edge(graph,x,y) ==-1:
                 display+=" "
-            display+=str(graph['adj'][x][y])
+            display+=str(Adj_Maxtix_Expand.get_edge(graph,x,y))
         print(display) 
         display = ""
-
+def get_edge(graph,edge,size):
+    edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
+    edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
+    return edge_bit1,edge_bit2
 
 
 def play_game():

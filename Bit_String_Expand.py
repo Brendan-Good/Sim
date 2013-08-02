@@ -103,13 +103,13 @@ def kick_to_graph(graph,abst_type):
 
     elif abst_type ==1:
         edge = [graph['scope']+1,graph['scope']+2]
-        color(edge,graph)
+        SimMCTest.color_red(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         edge = [graph['scope']+1,graph['scope']+2]
-        color(edge,graph)
+        SimMCTest.color_blue(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
@@ -118,10 +118,16 @@ def kick_to_graph(graph,abst_type):
     return vert_num
 
 def kick_all(graph):
+    while graph['abst'][0]!= 0:
+        graph['abst'][0]-=1
+        kick_to_graph(graph,0)    
     while graph['abst'][1]!= 0:
+        graph['abst'][1]-=1
         kick_to_graph(graph,1)
     while graph['abst'][2]!= 0:
+        graph['abst'][2]-=1
         kick_to_graph(graph,2)
+
 
 
 def update_real_abst(graph,real_coords,abst_type):

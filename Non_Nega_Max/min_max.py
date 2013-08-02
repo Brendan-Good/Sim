@@ -253,11 +253,11 @@ def display_graph(graph):
 
 def display_graph_b(graph,size):
     display = ""
-    dis = "   "
+    disp = "   "
     
     for x in range(0,size):
-        dis += str(x)
-        dis += " "
+        disp += str(x)
+        disp += " "
     print(dis)
     print(" ")
     for x in range(0,size):
