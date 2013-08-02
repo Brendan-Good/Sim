@@ -5,19 +5,24 @@ import is_terminal
 import SimMCTest
 from bitstring import BitArray
 
+Graph_Size = "AIIEE"
+
 def Test_Expand():
     n = 6
     l = 3
+
+    global Graph_Size 
+    Graph_Size = n
+
     abst = [n,0,0]
-    tuples = is_terminal.generate_structure(n,l)
     scope = -1
-    depth = 15
+    depth = n*(n-1)/2
     turn_number = 1
     game_over = False
-    graph_rep = n*(n-1)1BitArray(bin='0')
+    graph_rep = n*(n-1)BitArray(bin='0')
     red_edges = []
     blue_edges = []
-    graph = {'tuples':tuples,'abst':abst,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep,'red_edges':red_edges,'blue_edges':blue_edges}
+    graph = {'abst':abst,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False,'graph_rep':graph_rep,'red_edges':red_edges,'blue_edges':blue_edges}
     
     return Expand(graph)
 
@@ -59,8 +64,7 @@ def Expand(graph):
             if get_edge(graph,real_num,real_num2) == 0:
                 new_graph = layer_update(graph)
                 edge = [real_num,real_num2]
-                SimMCTest.color_red(edge,new_graph['graph_rep'],new_graph['red_edges'])
-                add_edge(new_graph,real_num,real_num2)                
+                SimMCTest.color_red(edge,new_graph)
                 child_graphs.append(new_graph)            
           
     return child_graphs
@@ -70,13 +74,6 @@ def layer_update(graph):
     #new_graph['depth']+=1 currently unnecessary 
     new_graph['turn_number']+=1
     return new_graph
-
-def add_edge(graph,n,m,wrong_turn = False):
-    edge = [n,m]
-    if wrong_turn: 
-        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number']-1)
-    else:
-        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
 
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
@@ -91,8 +88,7 @@ def update_abst_nodes(graph,cat1,cat2):
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_graph(graph,cat2)
         edge = [vert_num1,vert_num2]
-        SimMCTest.color_red(edge,graph['graph_rep'],graph['red_edges'])
-        add_edge(graph,vert_num1,vert_num2)
+        SimMCTest.color_red(edge,graph)
                     
 def kick_to_graph(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
@@ -107,15 +103,13 @@ def kick_to_graph(graph,abst_type):
 
     elif abst_type ==1:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMCTest.color_red(edge,graph['graph_rep'],graph['red_edges'])
-        add_edge(graph,graph['scope']+1,graph['scope']+2)
+        SimMCTest.color_red(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMCTest.color_blue(edge,graph['graph_rep'],graph['blue_edges'])
-        add_edge(graph,graph['scope']+1,graph['scope']+2,True)
+        SimMCTest.color_blue(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
@@ -136,8 +130,7 @@ def update_real_abst(graph,real_coords,abst_type):
     graph['abst'][abst_type] -=1
     vert_num = kick_to_graph(graph,abst_type)
     edge = [real_coords,vert_num]
-    SimMCTest.color_blue(edge,graph['graph_rep'],graph['red_edges'])
-    add_edge(graph,real_coords,vert_num)
+    SimMCTest.color_blue(edge,graph)
         
 def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
