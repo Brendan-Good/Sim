@@ -21,8 +21,10 @@ def Expand(graph):
     Recommended starting values:
     graph['adj']: full size, all zeros
     graph['abst']: graph['abst'][0]= number of nodes
+    graph['tuples']: check for win
     graph['scope']: -1
     graph['turn_num']
+    graph['val'] = 0
     graph['depth']: 1'''
     
     play_num = set_play_num(graph)
@@ -95,13 +97,19 @@ def kick_to_adj(graph,abst_type):
 
     elif abst_type ==1:
         graph['adj'][graph['scope']+1][graph['scope']+2] = 1
-        add_edge(graph,graph['scope']+1,graph['scope']+2)
+        edge = [graph['scope']+1,graph['scope']+2]
+        #lieing about who's turn it is
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,1)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         graph['adj'][graph['scope']+1][graph['scope']+2] =-1
-        add_edge(graph,graph['scope']+1,graph['scope']+2)
+        edge = [graph['scope']+1,graph['scope']+2]
+        #lieing about who's turn it is
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,2)
+        
+
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
