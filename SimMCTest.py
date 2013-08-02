@@ -8,6 +8,7 @@ import math
 import copy
 import itertools
 import Bit_String_Expand
+import Experimental_Bit_String
 
 Graph_Size = 6
 
@@ -36,11 +37,11 @@ for x in range(Graph_Size-1):
     for y in range(x+1,Graph_Size):
         blank_edges.append([x,y])
 
-abst = [18,0,0]
+abst = [6,0,0]
 
 scope = -1
 
-max_iterations = 10000
+max_iterations = 10000#This currently does nothing
 
 total_runs = 1
 
@@ -54,15 +55,22 @@ graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, '
 
 root = Node([],[],0,0,0,graph)
 
-def monte_carlo(max_iterations=10000,node=root):
+def monte_carlo(turn,max_iterations=10000,node=root):
+    global Graph_Size
+    if(turn == 15):
+        print("game over, I'll do some stuff to figure out who won later.")
     while node.children != []:
         node = best_child(node)
         max_iterations -= 1
-    for boards in Bit_String_Expand.Expand(node.board):
+    for boards in Experimental_Bit_String.Expand(node.board):
         (node.children).append(Node(node,[],0,0,float('inf'),boards))
     for nodes in node.children:
         play_random(nodes,nodes.board,nodes.board['turn_number'],)
-    monte_carlo(10000,best_child(node))
+        print("new node chosen")
+        print("it is about to be turn:", turn+1)
+        print("which should be different from:", 15)
+        print((best_child(node).board))
+        monte_carlo(turn+1,10000,best_child(node))
 
 def update_statistics(node,value):
     node.runs += 1
@@ -92,10 +100,10 @@ def play_random(node,graph,player_turn,):
     last_random_red = []
     last_random_blue = []
     node.runs += 1
-    random_games = 1 
+    random_games = 100 
     original_graph = graph
+    original_turn = player_turn
     while random_games > 0:
-        graph = original_graph
         while True:
             if(player_turn%2 == 1):
                 if(last_random_blue==[]):
@@ -110,7 +118,6 @@ def play_random(node,graph,player_turn,):
                     continue
                 else:
                     node = update_statistics(node,0)
-                    print("Random game has been played!")
                     break#I'm definitely going to have to change this later
             if(player_turn%2 == 0):
                 if(last_random_red==[]):
@@ -121,18 +128,20 @@ def play_random(node,graph,player_turn,):
                 elif(not check_win(last_random_red,last_graph['red_edges'])):    
                     last_random_blue = random.choice(last_graph['blank_edges'])
                     last_graph = color_blue(last_random_blue,last_graph)
-                    print(last_graph)
                     player_turn+=1
                     continue
                 else:
                     node = update_statistics(node,1)
-                    print("Random game has been played!")
                     break#this too
         random_games -= 1
-        print("random_games has been decremented")
+        print("game over")
+        print("random_games is now", random_games)
+        player_turn = original_turn
+        last_random_blue = []
+        last_random_red = []
+        graph = original_graph
 
 def color_red(edge,graph):
-    #Ohhhhhhhhhhhhhhhh! I am copying the global variable red_edges which is blank!
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
     will be our convention for saying an edge is red.''' 
     edge = sorted(edge)
@@ -158,6 +167,7 @@ def color_red(edge,graph):
     intermediate_graph['blank_edges'].remove(edge)
     print("just colored red:")
     print(intermediate_graph['red_edges'])
+    print(intermediate_graph['graph_rep'].bin)
     return copy.copy(intermediate_graph)
     
     
