@@ -5,7 +5,7 @@ import is_terminal
 import SimMCTest
 from bitstring import BitArray
 
-Graph_Size = "AIIEE"
+Graph_Size = 6
 
 def Test_Expand():
     n = 6
@@ -127,6 +127,7 @@ def kick_all(graph):
     while graph['abst'][2]!= 0:
         graph['abst'][2]-=1
         kick_to_graph(graph,2)
+    return graph
 
 
 
@@ -148,6 +149,3 @@ def color(edge,graph):
         SimMCTest.color_red(edge,graph)
     else:
         SimMCTest.color_blue(edge,graph)
-
-
-    
