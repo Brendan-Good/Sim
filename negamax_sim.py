@@ -58,15 +58,21 @@ def display_graph_b(graph,size):
         display+=str(x)
         display+=" "
         for y in range(0,size):
-            if Adj_Maxtix_Expand.get_edge(graph,x,y) ==-1:
+            if get_edge_color(graph,x,y,size) !=-1:
                 display+=" "
-            display+=str(Adj_Maxtix_Expand.get_edge(graph,x,y))
+            display+=str(get_edge_color(graph,x,y,size))
         print(display) 
         display = ""
-def get_edge(graph,edge,size):
-    edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
-    edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
-    return edge_bit1,edge_bit2
+def get_edge_color(graph,m,n,size):
+    edge_bit1 = graph['graph_rep'][2*m*size-(m*(m+1))+2*n-2*m-2]
+    edge_bit2 = graph['graph_rep'][2*m*size-(m*(m+1))+2*n-2*m-1]
+
+    if edge_bit1 == 1 and edge_bit2 == 0:
+        return 1
+    elif edge_bit1 == 0 and edge_bit2 == 1:
+        return -1
+    else:
+        return 0
 
 
 def play_game():
