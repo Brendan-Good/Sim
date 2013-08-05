@@ -66,7 +66,10 @@ def Expand(graph):
                 edge = [real_num,real_num2]
                 color(edge,new_graph)
                 child_graphs.append(new_graph)            
-          
+    
+    for child in child_graphs:
+        child['turn_num']+=1
+      
     return child_graphs
 
 def layer_update(graph):
