@@ -8,7 +8,6 @@ import math
 import copy
 import itertools
 import Bit_String_Expand
-import Experimental_Bit_String
 
 Graph_Size = 6
 
@@ -62,15 +61,14 @@ def monte_carlo(turn,max_iterations=10000,node=root):
     while node.children != []:
         node = best_child(node)
         max_iterations -= 1
-    for boards in Experimental_Bit_String.Expand(node.board):
+    for boards in Bit_String_Expand.Expand(node.board):
         (node.children).append(Node(node,[],0,0,float('inf'),boards))
     for nodes in node.children:
-        play_random(nodes,nodes.board,nodes.board['turn_number'],)
-        print("new node chosen")
-        print("it is about to be turn:", turn+1)
-        print("which should be different from:", 15)
-        print((best_child(node).board))
-        monte_carlo(turn+1,10000,best_child(node))
+        thing = copy.deepcopy(nodes.board)
+        play_random(nodes,Bit_String_Expand.kick_all(thing),nodes.board['turn_number'])
+    print(Bit_String_Expand.kick_all(node.board))
+    print("it is about to be turn:", turn+1)
+    monte_carlo(turn+1,10000,best_child(node))
 
 def update_statistics(node,value):
     node.runs += 1
@@ -121,6 +119,7 @@ def play_random(node,graph,player_turn,):
                     break#I'm definitely going to have to change this later
             if(player_turn%2 == 0):
                 if(last_random_red==[]):
+                    print(graph['blank_edges'])
                     last_random_blue = random.choice(graph['blank_edges'])
                     last_graph = color_blue(last_random_blue,graph)
                     player_turn+=1
@@ -147,16 +146,6 @@ def color_red(edge,graph):
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    #original_edges = graph['red_edges']
-    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
-    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
-    #graph['red_edges'] = copy.deepcopy(red_edges)
-    #graph['red_edges'].append(edge)
-    #graph['blank_edges'] = copy.deepcopy(blank_edges)
-    #graph['blank_edges'].remove(edge)
-    #intermediate_edges = copy.deepcopy(red_edges)
-    #intermediate_edges.append(edge)
-    #return graph
     print("input for coloring red:")
     print(graph['red_edges'],"red")
     print(graph['blue_edges'],"blue")
