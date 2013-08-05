@@ -49,14 +49,14 @@ def Expand(graph):
         for cat_num2 in range(cat_num,len(graph['abst'])):
             if graph['abst'][cat_num] != 0 and graph['abst'][cat_num2] != 0 and(cat_num != cat_num2 or graph['abst'][cat_num]>1):
                 new_graph = layer_update(graph)
-                update_abst_nodes(new_graph,cat_num,cat_num2)
+                new_graph = update_abst_nodes(new_graph,cat_num,cat_num2)
                 child_graphs.append(new_graph)
 
     for real_num in range(0,graph['scope']+1):
         for cat_num in range(0,len(graph['abst'])):
             if graph['abst'][cat_num]!=0:
                 new_graph = layer_update(graph)
-                update_real_abst(new_graph,real_num,cat_num)
+                new_graph =  update_real_abst(new_graph,real_num,cat_num)
                 child_graphs.append(new_graph)
     
     for real_num in range(0,graph['scope']+1):
@@ -64,11 +64,11 @@ def Expand(graph):
             if get_edge(graph,real_num,real_num2) == 0:
                 new_graph = layer_update(graph)
                 edge = [real_num,real_num2]
-                color(edge,new_graph)
+                new_graph = color(edge,new_graph)
                 child_graphs.append(new_graph)            
     
     for child in child_graphs:
-        child['turn_num']+=1
+        child['turn_number']+=1
       
     return child_graphs
 
@@ -82,15 +82,20 @@ def update_abst_nodes(graph,cat1,cat2):
 
     if cat1 == 0 and cat2 == 0:
         graph['abst'][0]-=2
-        graph['abst'][1]+=1
+        if(graph['turn_number']%2==1):
+            graph['abst'][1]+=1
+        else:
+            graph['abst'][2]+=1
     else:
         graph['abst'][cat1]-=1
-        vert_num1 = kick_to_graph(graph,cat1) 
+        vert_num1,graph = kick_to_graph(graph,cat1) 
         graph['abst'][cat2]-=1
-        vert_num2 = kick_to_graph(graph,cat2)
+        vert_num2,graph = kick_to_graph(graph,cat2)
         edge = [vert_num1,vert_num2]
-        color(edge,graph)
-                    
+        graph = color(edge,graph)
+     
+    return graph
+               
 def kick_to_graph(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
     of that abstract structure to the adj matrix.
@@ -104,30 +109,30 @@ def kick_to_graph(graph,abst_type):
 
     elif abst_type ==1:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMCTest.color_red(edge,graph)
+        graph = SimMCTest.color_red(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
     elif abst_type ==2:
         edge = [graph['scope']+1,graph['scope']+2]
-        SimMCTest.color_blue(edge,graph)
+        graph = SimMCTest.color_blue(edge,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
     else:
         print("something's gone horribly wrong (1)")
 
-    return vert_num
+    return vert_num,graph
 
 def kick_all(graph):
     while graph['abst'][0]!= 0:
         graph['abst'][0]-=1
-        kick_to_graph(graph,0)    
+        graph = kick_to_graph(graph,0)[1]    
     while graph['abst'][1]!= 0:
         graph['abst'][1]-=1
-        kick_to_graph(graph,1)
+        graph =  kick_to_graph(graph,1)[1]
     while graph['abst'][2]!= 0:
         graph['abst'][2]-=1
-        kick_to_graph(graph,2)
+        graph =  kick_to_graph(graph,2)[1]
     return graph
 
 
@@ -136,10 +141,11 @@ def update_real_abst(graph,real_coords,abst_type):
     '''This function could probably be inline as is, but it may grow if more
     abstract catagories are added, plus this is how the others are done'''
     graph['abst'][abst_type] -=1
-    vert_num = kick_to_graph(graph,abst_type)
+    vert_num,graph = kick_to_graph(graph,abst_type)
     edge = [real_coords,vert_num]
-    color(edge,graph)
-        
+    graph = color(edge,graph)
+    return graph
+    
 def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
     edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
@@ -147,6 +153,7 @@ def get_edge(graph,n,m):
 
 def color(edge,graph):
     if(graph['turn_number']%2==1):
-        SimMCTest.color_red(edge,graph)
+        return SimMCTest.color_red(edge,graph)
     else:
-        SimMCTest.color_blue(edge,graph)
+        return SimMCTest.color_blue(edge,graph)
+    
