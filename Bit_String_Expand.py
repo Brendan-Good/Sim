@@ -124,16 +124,17 @@ def kick_to_graph(graph,abst_type):
     return vert_num,graph
 
 def kick_all(graph):
-    while graph['abst'][0]!= 0:
-        graph['abst'][0]-=1
-        graph = kick_to_graph(graph,0)[1]    
-    while graph['abst'][1]!= 0:
-        graph['abst'][1]-=1
-        graph =  kick_to_graph(graph,1)[1]
-    while graph['abst'][2]!= 0:
-        graph['abst'][2]-=1
-        graph =  kick_to_graph(graph,2)[1]
-    return graph
+    new_graph = copy.deepcopy(graph)
+    while new_graph['abst'][0]!= 0:
+        new_graph['abst'][0]-=1
+        new_graph = kick_to_graph(new_graph,0)[1]    
+    while new_graph['abst'][1]!= 0:
+        new_graph['abst'][1]-=1
+        new_graph =  kick_to_graph(new_graph,1)[1]
+    while new_graph['abst'][2]!= 0:
+        new_graph['abst'][2]-=1
+        new_graph =  kick_to_graph(new_graph,2)[1]
+    return new_graph
 
 
 
