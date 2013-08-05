@@ -61,7 +61,7 @@ def Expand(graph):
     
     for real_num in range(0,graph['scope']+1):
         for real_num2 in range(real_num+1,graph['scope']+1):
-            if get_edge(graph,real_num,real_num2) == 0:
+            if get_edge(graph,real_num,real_num2) == [0,0]:
                 new_graph = layer_update(graph)
                 edge = [real_num,real_num2]
                 new_graph = color(edge,new_graph)
