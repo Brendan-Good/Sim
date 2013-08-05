@@ -147,7 +147,7 @@ def update_real_abst(graph,real_coords,abst_type):
     graph = color(edge,graph)
     return graph
     
-def get_edge(graph,n,m):
+def get_edge(graph,m,n):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
     edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
     return [edge_bit1,edge_bit2]
