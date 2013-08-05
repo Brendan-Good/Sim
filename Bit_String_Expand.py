@@ -8,6 +8,7 @@ from bitstring import BitArray
 Graph_Size = 6
 
 def Test_Expand():
+    '''Returns an example graph declaration after one expand'''
     n = 6
     l = 3
 
@@ -28,19 +29,23 @@ def Test_Expand():
 
 def Expand(graph):
     ''' Takes in a graph dictionary and returns a list of all possible graphs
-    after taking one move. abstract node types in graph["abst"]: 0 is the number
-    of nodes with no colored edges, 1 is the number of isolated red edges, 2 is the
-    number of isolated green/blue/2nd edges. Returns a list of graphs after
-    distinct moves with an attached list of metadata (abstract node numbers).
-
-    add_edge should probably be update_structure
+    after taking one move. abstract node types in graph['abst']: 0 is the number
+    of nodes with no colored edges, 1 is the number of isolated red edges, 2 is
+    the number of isolated green/blue/2nd player edges. graph['abst'][0] is the 
+    number of unconnected vertices, graph['abst'][1] is the number of isolated red 
+    edges, and so on. Two isolated vertices become one isolated edge.
     
-    Recommended starting values:
-    graph['turn_number']: 1
-    graph['graph_rep']: full size, all zeros, bit_string object
-    graph['abst']: graph['abst'][0]= number of nodes
-    graph['scope']: -1
-    graph['depth']: 1'''
+    Returns a list of graphs after all possible distinct moves with a list of
+    metadata (abstract node numbers) in the graph dictionary under the name 'abst'.
+    
+    For recommended starting values see Test_Expand above
+
+    Works by iterating through all combinations of abstract types and "real" 
+    verticies and drawning a line between them.
+
+    increments the turn number of all child graphs before returning them so that 
+    they are ready to be expanded again without any modification.
+    '''
 
     child_graphs = []
     new_graph = []
@@ -73,12 +78,14 @@ def Expand(graph):
     return child_graphs
 
 def layer_update(graph):
+    ''' currently pointless '''
     new_graph = copy.deepcopy(graph)
     return new_graph
 
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
-    non-abstract nodes to the adj matrix '''
+    non-abstract nodes to the graph_rep. Copies and returns the graph with these
+    changes'''
 
     if cat1 == 0 and cat2 == 0:
         graph['abst'][0]-=2
@@ -97,11 +104,12 @@ def update_abst_nodes(graph,cat1,cat2):
     return graph
                
 def kick_to_graph(graph,abst_type):
-    '''Takes a graph and a kind of abstract structure and adds one
-    of that abstract structure to the adj matrix.
-    returns vert number of the first node kicked.
+    '''Takes in a graph and a kind of abstract structure and adds one
+    of that abstract structure to the graph_rep.
+    returns vert number of the first node kicked and the modifed graph.
     It may someday return the locations of the begining and end of the
-    abstract structure kicked if need be.'''
+    abstract structure kicked if an abstract structure is allowed to have non
+    isomorphic verticies.'''
     
     if abst_type ==0:
         graph['scope']+=1
@@ -124,6 +132,7 @@ def kick_to_graph(graph,abst_type):
     return vert_num,graph
 
 def kick_all(graph):
+   '''returns a copy of the graph with all abstract vertices made real via kicking.'''
     new_graph = copy.deepcopy(graph)
     while new_graph['abst'][0]!= 0:
         new_graph['abst'][0]-=1
@@ -136,11 +145,9 @@ def kick_all(graph):
         new_graph =  kick_to_graph(new_graph,2)[1]
     return new_graph
 
-
-
 def update_real_abst(graph,real_coords,abst_type):
-    '''This function could probably be inline as is, but it may grow if more
-    abstract catagories are added, plus this is how the others are done'''
+    '''drawns an edge of the current player's color between a real edge and an
+    abstract structure by making that abstract strucure real, then adding the edge '''
     graph['abst'][abst_type] -=1
     vert_num,graph = kick_to_graph(graph,abst_type)
     edge = [real_coords,vert_num]
@@ -148,11 +155,15 @@ def update_real_abst(graph,real_coords,abst_type):
     return graph
     
 def get_edge(graph,m,n):
+    '''returns the normal ones and zeros as trues and falses, but does find them in
+    bit array as long as the global graph size is correct '''
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
     edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
     return [edge_bit1,edge_bit2]
 
 def color(edge,graph):
+    '''Adds an edge of the appropreate color to the graph_rep and other
+    Brandon related variables.'''
     if(graph['turn_number']%2==1):
         return SimMCTest.color_red(edge,graph)
     else:
