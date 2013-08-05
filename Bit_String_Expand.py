@@ -61,7 +61,7 @@ def Expand(graph):
     
     for real_num in range(0,graph['scope']+1):
         for real_num2 in range(real_num+1,graph['scope']+1):
-            if get_edge(graph,real_num,real_num2) == [0,0]:
+            if get_edge(graph,real_num,real_num2) == [False,False]:
                 new_graph = layer_update(graph)
                 edge = [real_num,real_num2]
                 new_graph = color(edge,new_graph)
@@ -150,7 +150,7 @@ def update_real_abst(graph,real_coords,abst_type):
 def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
     edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
-    return edge_bit1,edge_bit2
+    return [edge_bit1,edge_bit2]
 
 def color(edge,graph):
     if(graph['turn_number']%2==1):
