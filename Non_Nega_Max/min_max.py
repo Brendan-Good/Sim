@@ -109,7 +109,7 @@ def play_game():
     print("grand total nodes = ", grand_nodes_visited)
     '''
 def max_manager(graph):
-    '''contains the default values for max '''
+    '''??? '''
     global nodes_visited
     nodes_visited +=1
     global inf
@@ -119,12 +119,14 @@ def max_manager(graph):
     for child in Expand.Expand(graph):
         if child['game_over']:
             return child
-        elif min_of(child,-1*inf,inf)>= val:
+        m =  min_of(child,-1*inf,inf)
+        if m  >= val:
             new_graph = child
+            val = m
     return new_graph
 
 def min_manager(graph):
-    '''contains the default values for max '''
+    '''??? non funtional ??? '''
     global nodes_visited
     nodes_visited +=1
     global inf
@@ -153,7 +155,7 @@ def max_of(graph,alpha ="oh dear",beta="quite a problem"):
     return m
 
 def min_of(graph,alpha,beta):
-    
+        
     global nodes_visited
     nodes_visited +=1
     global inf
