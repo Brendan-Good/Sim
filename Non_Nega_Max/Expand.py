@@ -5,7 +5,7 @@ import is_terminal
 
 def set_play_num(graph):
     play_num = "all is lost"
-    if graph['turn_num']%2 == 1:
+    if graph['turn_number']%2 == 1:
         return 1
     else:
         return -1
@@ -23,7 +23,7 @@ def Expand(graph):
     graph['abst']: graph['abst'][0]= number of nodes
     graph['tuples']: check for win
     graph['scope']: -1
-    graph['turn_num']
+    graph['turn_number']
     graph['val'] = 0
     graph['depth']: 1'''
     
@@ -52,7 +52,10 @@ def Expand(graph):
                 new_graph['adj'][real_num][real_num2]= play_num
                 add_edge(new_graph,real_num,real_num2)                
                 child_graphs.append(new_graph)            
-          
+    
+    for child in child_graphs:
+        child['turn_number']+=1
+      
     return child_graphs
 
 def layer_update(graph):
@@ -61,7 +64,7 @@ def layer_update(graph):
 
 def add_edge(graph,n,m):
     edge = [n,m]
-    graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_num'])
+    graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
     
 
 def update_abst_nodes(graph,cat1,cat2):
