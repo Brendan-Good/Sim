@@ -132,7 +132,7 @@ def kick_to_graph(graph,abst_type):
     return vert_num,graph
 
 def kick_all(graph):
-   '''returns a copy of the graph with all abstract vertices made real via kicking.'''
+    '''returns a copy of the graph with all abstract vertices made real via kicking.'''
     new_graph = copy.deepcopy(graph)
     while new_graph['abst'][0]!= 0:
         new_graph['abst'][0]-=1
