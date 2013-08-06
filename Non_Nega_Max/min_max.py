@@ -35,8 +35,6 @@ def make_statistic():
         else:
             ties +=1
         
-        
-
     print("final red wins = ", red_wins)
     print("final blue wins = ", blue_wins)
     print("final red wins ",red_wins/(red_wins+blue_wins)," of games")
@@ -255,23 +253,31 @@ def display_graph(graph):
 
     print('abst = ',graph['abst'],'scope = ', graph['scope'])
 
-def display_graph_b(graph,size):
+def get_edge(graph,m,n,Graph_Size):
+    edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
+    edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
+    return [edge_bit1,edge_bit2]
+
+def display_graph_b(graph,Graph_Size):
     display = ""
     disp = "   "
     
-    for x in range(0,size):
+    for x in range(0,Graph_Size):
         disp += str(x)
         disp += " "
-    print(dis)
+    print(disp)
     print(" ")
-    for x in range(0,size):
+    for x in range(0,Graph_Size):
         display+=str(x)
         display+=" "
-        for y in range(0,size):
-            if Expand.get_edge(graph,x,y) == [False,True]:
-                display+="-1"
-            elif Expand.get_edge(graph,x,y) == [True,False]:
-                display+=" 1"
+        for y in range(0,Graph_Size):
+            if y > x:
+                if get_edge(graph,x,y,Graph_Size) == [False,True]:
+                    display+="-1"
+                elif get_edge(graph,x,y,Graph_Size) == [True,False]:
+                    display+=" 1"
+                else:
+                    display+=" 0"
             else:
                 display+=" 0"
         print(display) 
