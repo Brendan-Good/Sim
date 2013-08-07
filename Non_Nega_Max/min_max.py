@@ -56,8 +56,8 @@ def play_game():
     while not game_over:
         
         print("turn number going in is ", graph['turn_number']) 
-        graph = max_manager(graph)
-        print("Smart? red move below")
+        graph =  max_manager(graph)
+        print("Random red move below")
         display_graph(graph)
         global nodes_visited
         print("nodes visited = ", nodes_visited)
@@ -70,8 +70,8 @@ def play_game():
         game_over = graph['game_over']
         if not game_over:
             print("turn number going in is ", graph['turn_number'])
-            graph = random.choice(Expand.Expand(graph))           
-            print("Random blue move below")
+            graph = random.choice(Expand.Expand(graph))      
+            print("Smart blue move below")
             display_graph(graph)
         if graph['game_over']:
             return -1

@@ -25,11 +25,27 @@ def Expand(graph):
     graph['scope']: -1
     graph['turn_number']
     graph['val'] = 0
-    graph['depth']: 1'''
+    graph['depth']: 1
+    graph['val']: 0'''
     
     play_num = set_play_num(graph)
     child_graphs = []
     new_graph = []
+
+    for real_num in range(0,graph['scope']+1):
+        for real_num2 in range(real_num+1,graph['scope']+1):
+            if graph['adj'][real_num][real_num2] == 0:
+                new_graph = layer_update(graph)
+                new_graph['adj'][real_num][real_num2]= play_num
+                win_update(new_graph,real_num,real_num2)                
+                child_graphs.append(new_graph)           
+
+    for real_num in range(0,graph['scope']+1):
+        for cat_num in range(0,len(graph['abst'])):
+            if graph['abst'][cat_num]!=0:
+                new_graph = layer_update(graph)
+                update_real_abst(new_graph,real_num,cat_num)
+                child_graphs.append(new_graph) 
     
     for cat_num in range(0,len(graph['abst'])):
         for cat_num2 in range(cat_num,len(graph['abst'])):
@@ -38,21 +54,6 @@ def Expand(graph):
                 update_abst_nodes(new_graph,cat_num,cat_num2)
                 child_graphs.append(new_graph)
 
-    for real_num in range(0,graph['scope']+1):
-        for cat_num in range(0,len(graph['abst'])):
-            if graph['abst'][cat_num]!=0:
-                new_graph = layer_update(graph)
-                update_real_abst(new_graph,real_num,cat_num)
-                child_graphs.append(new_graph)
-    
-    for real_num in range(0,graph['scope']+1):
-        for real_num2 in range(real_num+1,graph['scope']+1):
-            if graph['adj'][real_num][real_num2] == 0:
-                new_graph = layer_update(graph)
-                new_graph['adj'][real_num][real_num2]= play_num
-                add_edge(new_graph,real_num,real_num2)                
-                child_graphs.append(new_graph)            
-    
     for child in child_graphs:
         child['turn_number']+=1
       
@@ -62,7 +63,7 @@ def layer_update(graph):
     new_graph = copy.deepcopy(graph)
     return new_graph
 
-def add_edge(graph,n,m):
+def win_update(graph,n,m):
     edge = [n,m]
     graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
     
@@ -85,7 +86,7 @@ def update_abst_nodes(graph,cat1,cat2):
         graph['abst'][cat2]-=1
         vert_num2 = kick_to_adj(graph,cat2)
         graph['adj'][vert_num1][vert_num2] = play_num
-        add_edge(graph,vert_num1,vert_num2)
+        win_update(graph,vert_num1,vert_num2)
                     
 def kick_to_adj(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
@@ -127,7 +128,7 @@ def update_real_abst(graph,real_coords,abst_type):
     graph['abst'][abst_type] -=1
     vert_num = kick_to_adj(graph,abst_type)
     graph['adj'][real_coords][vert_num] = play_num
-    add_edge(graph,real_coords,vert_num)
+    win_update(graph,real_coords,vert_num)
         
 def get_edge(graph,n,m):
     edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]

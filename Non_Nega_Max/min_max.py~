@@ -15,9 +15,18 @@ def make_statistic():
     red_wins = 0
     blue_wins = 0
     ties = 0
-    
+    winner = play_game()
+    if winner == 1: 
+        red_wins+=1
+    elif winner == -1:
+        blue_wins+=1
+    else:
+        ties +=1    
+
     for x in range(10000):
-        print(x)
+        print("final red wins = ", red_wins)
+        print("final blue wins = ", blue_wins)
+        print("final red wins ",red_wins/(red_wins+blue_wins)," of games")
         winner = play_game()
         if winner == 1: 
             red_wins+=1
@@ -25,11 +34,7 @@ def make_statistic():
             blue_wins+=1
         else:
             ties +=1
-        if x%10 ==0:
-            print(x, " trials have been run")
-            print("red wins = ", red_wins)
-            print("blue wins = ", blue_wins)
-            print("red wins ",red_wins/(red_wins+blue_wins)," of games")
+        
     print("final red wins = ", red_wins)
     print("final blue wins = ", blue_wins)
     print("final red wins ",red_wins/(red_wins+blue_wins)," of games")
@@ -42,29 +47,35 @@ def play_game():
     abst = [6,0,0]
     tuples = is_terminal.generate_structure(6,3)
     scope = -1
-    start_height = 15
     turn_number = 1
     game_over = False
     val = 0
-    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'start_height':start_height,'turn_number':turn_number,'game_over':False,'val':val}
+    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'turn_number':turn_number,'game_over':False,'val':val}
 
     grand_nodes_visited = 0
     while not game_over:
         
-        graph =  random.choice(Expand.Expand(graph))
+        print("turn number going in is ", graph['turn_number']) 
+        graph = random.choice(Expand.Expand(graph))
         print("Random red move below")
         display_graph(graph)
-        if graph['turn_number']==16:
+        global nodes_visited
+        print("nodes visited = ", nodes_visited)
+        if graph['game_over']:
+            return 1
+        elif graph['turn_number']==16:
+            print("that graph was a red win, right?")
             return 1
 
         game_over = graph['game_over']
         if not game_over:
-            graph = max_manager(graph,start_height)
-            global nodes_visited
-            print("nodes visited = ", nodes_visited)
-            print("Random blue move below")
+            print("turn number going in is ", graph['turn_number'])
+            graph =  max_manager(graph)         
+            print("Smart blue move below")
             display_graph(graph)
-        if graph['turn_number']==16:
+        if graph['game_over']:
+            return -1
+        elif graph['turn_number']>=16:
             print("turn number is not working")
             return "turn number is not working"
         
@@ -77,10 +88,13 @@ def play_game():
     display_graph(graph)
     
     if graph['turn_number']%2 == 0:
+        print("error?")
         return 1
-    elif graph['turn_number']%2 == 2:
-        return 1
+    elif graph['turn_number']%2 == 1:
+        print("error?")
+        return 2
     else:
+        print("error?")
         return 0  
     '''
         if not game_over:
@@ -92,84 +106,92 @@ def play_game():
 
     print("grand total nodes = ", grand_nodes_visited)
     '''
-def max_manager(graph,start_height):
-    '''contains the default values for max '''
+def max_manager(graph):
+    '''??? '''
     global nodes_visited
     nodes_visited +=1
+    global inf
 
     new_graph = "the unthinkable error"
     val = -1*inf
     for child in Expand.Expand(graph):
-        if min_of(graph,-1*inf,inf,start_height)>= val:
+        if child['game_over']:
+            return child
+        m =  min_of(child,-1*inf,inf)
+        if m  >= val:
             new_graph = child
+            val = m
     return new_graph
 
-def min_manager(graph,start_height):
-    '''contains the default values for max '''
+def min_manager(graph):
+    '''??? non funtional ??? '''
     global nodes_visited
     nodes_visited +=1
+    global inf
 
     new_graph = "the unthinkable error"
     val = inf
     for child in Expand.Expand(graph):
-        if max_of(graph,-1*inf,inf,start_height-1)<= val:
+        if child['game_over']:
+            return -1*inf
+        elif max_of(child,-1*inf,inf)<= val:
             new_graph = child
     return new_graph
 
-def max_of(graph,alpha ="oh dear",beta="quite a problem" ,height = "we have" ):
+def max_of(graph,alpha ="oh dear",beta="quite a problem"):
     global nodes_visited
-
-    if graph['game_over']:
-        return inf
-    elif height <= 0:
-        return 0
-
+    nodes_visited +=1
+    global inf
+    
     m = alpha
     for child in Expand.Expand(graph):
-        m = max(m,min_of(child,m,beta,height-1))
+        if child['game_over']:
+            return inf
+        m = max(m,min_of(child,m,beta))
         if m >= beta:
             return m
     return m
 
-def min_of(graph,alpha ,beta ,height):
-    
+def min_of(graph,alpha,beta):
+        
     global nodes_visited
     nodes_visited +=1
-
-    if graph['game_over']:
-        return inf
-    elif height <= 0:
-        return 0
+    global inf
 
     m = beta
     for child in Expand.Expand(graph):
-        m  = min(m,max_of(child,alpha,m,height-1))
+        if child['game_over']:
+            return -1*inf
+        m  = min(m,max_of(child,alpha,m))
         if m <= alpha:
             return m
     return m
 
 def game_test():
-    adj = [[0 for col in range(5)] for row in range(5)]
-    abst = [5,0,0]
-    tuples = is_terminal.generate_structure(5,3)
+    adj = [[0 for col in range(4)] for row in range(4)]
+    abst = [4,0,0]
+    tuples = is_terminal.generate_structure(4,3)
     scope = -1
     depth = 10
-    turn_num = 1
+    turn_number = 1
     game_over = False
-    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'depth':depth,'turn_num':turn_num,'game_over':False}
-     
+    graph = {'tuples':tuples,'abst':abst,'adj':adj,'scope':scope,'depth':depth,'turn_number':turn_number,'game_over':False}
+    
+    print("original graph = ",)
+    display_graph(graph)
+ 
     print("                       begin x")
     x = Expand.Expand(graph)
     display_graph(x[0])
     print('abst = ',x[0]['abst'])
     print("                       begin y's")
-    x[0]['turn_num'] +=1
+
     y = Expand.Expand(x[0])
     for grap in y:
         display_graph(grap)
         print('abst = ',grap['abst'])
         print('scope = ',grap['scope'])
-    y[0]['turn_num'] +=1
+
     z = Expand.Expand(y[0])
 
     print("                       begin z's")
@@ -177,8 +199,9 @@ def game_test():
         display_graph(grap)
         print('abst = ',grap['abst'])
         print('scope = ',grap['scope'])
-    z[0]['turn_num'] +=1
     Q = Expand.Expand(z[0])
+
+    display_graph(z[0])
 
     print("                       begin Q's")
     for grap in Q:
@@ -186,27 +209,9 @@ def game_test():
         print('abst = ',grap['abst'])
         print('scope = ',grap['scope'])
 
+    print("original graph = ")
+    display_graph(graph)
     
-    '''
-    while not game_over:
-        graph = max()[0]
-        
-        print(graph['abst']," abst ")
-        display_graph(graph)
-        print(graph['adj'])
-        print(graph['game_over'], "game over")
-        graph['turn_num']+=1
-        game_over = graph['game_over']
-        #if not game_over:
-        #    vert1 = int(input('player turn:'))
-        #    vert2 = int(input('player turn:'))
-        #    graph['adj'][vert1][vert2]=-1
-        #    graph['scope']+=2
-        #    graph['abst'][0]-=2
-        #    display_graph(graph)
-
-    print("nodes visited = ", nodes_visited)
-    '''
 
 def test_is_terminal():
     ter = is_terminal
@@ -248,22 +253,33 @@ def display_graph(graph):
 
     print('abst = ',graph['abst'],'scope = ', graph['scope'])
 
-def display_graph_b(graph,size):
+def get_edge(graph,m,n,Graph_Size):
+    edge_bit1 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2]
+    edge_bit2 = graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1]
+    return [edge_bit1,edge_bit2]
+
+def display_graph_b(graph,Graph_Size):
     display = ""
     disp = "   "
     
-    for x in range(0,size):
+    for x in range(0,Graph_Size):
         disp += str(x)
         disp += " "
-    print(dis)
+    print(disp)
     print(" ")
-    for x in range(0,size):
+    for x in range(0,Graph_Size):
         display+=str(x)
         display+=" "
-        for y in range(0,size):
-            if Expand.get_edge(graph,x,y):
-                display+=" "
-            display+=str(graph['adj'][x][y])
+        for y in range(0,Graph_Size):
+            if y > x:
+                if get_edge(graph,x,y,Graph_Size) == [False,True]:
+                    display+="-1"
+                elif get_edge(graph,x,y,Graph_Size) == [True,False]:
+                    display+=" 1"
+                else:
+                    display+=" 0"
+            else:
+                display+=" 0"
         print(display) 
         display = ""
 
