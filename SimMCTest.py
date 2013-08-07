@@ -55,17 +55,24 @@ graph = {'graph_rep':graph_rep,'total_runs':total_runs, 'red_edges':red_edges, '
 root = Node([],[],0,0,0,graph)
 
 def monte_carlo(turn,max_iterations=10000,node=root):
+    global last_random_red
+    global last_random_blue
     global Graph_Size
     if(turn == 15):
         print("game over, I'll do some stuff to figure out who won later.")
-    while node.children != []:
-        node = best_child(node)
-        max_iterations -= 1
+    if(turn != 1 and turn%2==1 and check_win(last_random_red,node.board['red_edges'])):
+        return best_child(node).board
+    elif(turn%2==0 and check_win(last_random_blue,node.board['blue_edges'])):
+        return best_child(node).board
+    #while node.children != []:
+    #    node = best_child(node)
+    #    max_iterations -= 1
     for boards in Bit_String_Expand.Expand(node.board):
         (node.children).append(Node(node,[],0,0,float('inf'),boards))
     for nodes in node.children:
         thing = copy.deepcopy(nodes.board)
         play_random(nodes,Bit_String_Expand.kick_all(thing),nodes.board['turn_number'])
+    print(node.board)
     print(Bit_String_Expand.kick_all(node.board))
     print("it is about to be turn:", turn+1)
     monte_carlo(turn+1,10000,best_child(node))
@@ -95,11 +102,12 @@ def value(node):
     return value
 
 def play_random(node,graph,player_turn,):
-    last_random_red = []
-    last_random_blue = []
+    global last_random_red
+    global last_random_blue
     node.runs += 1
     random_games = 100 
     original_graph = graph
+    last_graph = graph
     original_turn = player_turn
     while random_games > 0:
         while True:
@@ -135,6 +143,8 @@ def play_random(node,graph,player_turn,):
         random_games -= 1
         print("game over")
         print("random_games is now", random_games)
+        if(random_games == 0):
+            break
         player_turn = original_turn
         last_random_blue = []
         last_random_red = []
@@ -186,6 +196,7 @@ def color_blue(edge,graph):
     print(intermediate_graph['blue_edges'])
     return copy.copy(intermediate_graph)
 
+
 def is_terminal(Edge,Edges_to_Check,turn_number):
     if(turn_number==(n*(n-1))/2 or check_win(Edge,Edges_to_Check)):
         return true
@@ -199,13 +210,14 @@ def check_win(Edge,Edges_to_Check):
     takes in the edge just colored and all edges of that color and checks to see if that satisfies the condition for a win.
     Example: [x,y] colored blue. check_win takes[x,y] and all of the blue_edges as input.
     '''
+    original_edge = Edge
     colored_list = [[Edge[0],Edge[1]]]
     stored_vertices = []
     if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):#If there aren't enough edges of the same color as our edge, then false.
         print(Edges_to_Check,"Edges_to_Check")
         return False
     else:
-        for edges in Edges_to_Check:#If any of our edges in Edges_to_Check has Edge[0] as an endpoint, add the other endpoint to our list of stored vertices
+        for edges in Edges_to_Check:#If any of our edges in Edges_to_Check has Edge[0] as an endpoint, add the other endpoint to our list of stored verticesn
             if(edges==Edge):
                 continue
             if(edges[0] == Edge[0]):
@@ -221,8 +233,8 @@ def check_win(Edge,Edges_to_Check):
             return False
         else:
             l_minus_2_combinations = list(itertools.combinations(stored_vertices,win_subgraph-2))#create an l-2 combination of the stored vertices (we omit the two endpoints of Edge as it is guaranteed to be in a k_l if Edge forms a new k_l)
-            iterator = 0
             for combinations in range(len(l_minus_2_combinations)):
+                iterator = 0
                 l_minus_2_combinations[combinations]=list(l_minus_2_combinations[combinations])
                 l_minus_2_combinations[combinations].append(Edge[0])
                 l_minus_2_combinations[combinations].append(Edge[1])
@@ -240,6 +252,7 @@ def check_win(Edge,Edges_to_Check):
                     print(iterator)
             if(iterator==len(l_minus_2_combinations)):
                 return False
+            
                         
 def connect(vertex1,vertex2):
     edge = [min(vertex1,vertex2),max(vertex1,vertex2)]
