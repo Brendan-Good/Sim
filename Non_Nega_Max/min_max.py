@@ -7,6 +7,7 @@ from collections import deque
 import copy
 import random
 
+
 nodes_visited = 0
 inf = float('inf')
 

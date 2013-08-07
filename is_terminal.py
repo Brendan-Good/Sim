@@ -4,17 +4,23 @@ import scipy
 import math
 import itertools
 
-end_condition = 3
+end_condition = "type clash!"
 
-graph_size = 5
+graph_size = "type clash!"
 
-vertices_set=set(range(graph_size))
+vertices_set = "type clash!"
 
-possible_kl = list(map(set, itertools.combinations(vertices_set,end_condition)))
+possible_kl = "type clash!" 
 
 def generate_structure(n,l):
+    global graph_size
     graph_size = n
+    global vertices_set
+    vertices_set=set(range(graph_size))
+    global end_condition
     end_condition = l
+    global possible_kl
+    possible_kl = list(map(set, itertools.combinations(vertices_set,end_condition)))
     return numpy.zeros(shape=[n]*l,dtype=float)
     
 def is_terminal(structure,edge,turn):

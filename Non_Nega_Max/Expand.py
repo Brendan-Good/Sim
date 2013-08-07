@@ -2,6 +2,7 @@
 
 import copy
 import is_terminal
+import Eval
 
 def set_play_num(graph):
     play_num = "all is lost"
@@ -66,7 +67,7 @@ def layer_update(graph):
 def win_update(graph,n,m):
     edge = [n,m]
     graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
-    
+    graph['val'] = Eval.Eval(graph,edge)    
 
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
