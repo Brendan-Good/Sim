@@ -66,8 +66,7 @@ def layer_update(graph):
 
 def win_update(graph,n,m):
     edge = [n,m]
-    graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'])
-    graph['val'] = Eval.Eval(graph,edge)    
+    graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,graph['turn_number'],graph)
 
 def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
@@ -104,7 +103,7 @@ def kick_to_adj(graph,abst_type):
         graph['adj'][graph['scope']+1][graph['scope']+2] = 1
         edge = [graph['scope']+1,graph['scope']+2]
         #lieing about who's turn it is
-        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,1)
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,1,graph)
         graph['scope']+=2
         vert_num = graph['scope']-1
 
@@ -112,7 +111,7 @@ def kick_to_adj(graph,abst_type):
         graph['adj'][graph['scope']+1][graph['scope']+2] =-1
         edge = [graph['scope']+1,graph['scope']+2]
         #lieing about who's turn it is
-        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,2)
+        graph['game_over'] = is_terminal.is_terminal(graph['tuples'],edge,2,graph)
         
 
         graph['scope']+=2
