@@ -5,7 +5,7 @@ import is_terminal
 import SimMCTest
 from bitstring import BitArray
 
-Graph_Size = 6
+Graph_Size = 6 
 
 def Test_Expand():
     '''Returns an example graph declaration after one expand'''

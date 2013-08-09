@@ -9,7 +9,7 @@ import copy
 import itertools
 import Bit_String_Expand
 
-Graph_Size = 6
+Graph_Size = 6 
 
 win_subgraph = 3
 
@@ -58,6 +58,7 @@ def list_difference(a,b):
     return [edge for edge in a if edge not in b]
 
 def monte_carlo(turn,node=root):
+    random_games = 100
     print("monte carlo called")
     print(Bit_String_Expand.kick_all(node.board))
     global Graph_Size
@@ -74,7 +75,7 @@ def monte_carlo(turn,node=root):
         verbose_check_win(list_difference(
         Bit_String_Expand.kick_all(node.board)['red_edges'],
         Bit_String_Expand.kick_all((node.parent).board)['red_edges']),Bit_String_Expand.kick_all(node.board)['red_edges']) 
-        return node.board
+        return 1
     elif(turn != 1 and turn%2==1 and verbose_check_win(list_difference(
         Bit_String_Expand.kick_all(node.board)['blue_edges'],
         Bit_String_Expand.kick_all((node.parent).board)['blue_edges']),
@@ -83,90 +84,117 @@ def monte_carlo(turn,node=root):
         Bit_String_Expand.kick_all(node.board)['blue_edges'],
         Bit_String_Expand.kick_all((node.parent).board)['blue_edges']),
         Bit_String_Expand.kick_all(node.board)['blue_edges'])
-        return node.board
+        return 0
     #while node.children != []:
     #    node = best_child(node)
     #    max_iterations -= 1
     for boards in Bit_String_Expand.Expand(node.board):
-        (node.children).append(Node(node,[],0,0,float('inf'),boards))
+        (node.children).append(Node(node,[],0,0,1000000000,boards))
     for nodes in node.children:
         thing = copy.deepcopy(nodes.board)
-        play_random(nodes,Bit_String_Expand.kick_all(thing),turn+1)
+        also_thing = Bit_String_Expand.kick_all(node.board)
+        another_thing = Bit_String_Expand.kick_all(thing)
+        if(turn != 1 and turn%2==1):
+            if(verbose_check_win(list_difference(another_thing['red_edges'],also_thing['red_edges']),another_thing['red_edges'])):
+                nodes.value = float('inf')
+                nodes.wins = 1000000
+                break
+        elif(turn != 2 and turn%2 == 0):
+            if(verbose_check_win(list_difference(another_thing['blue_edges'],also_thing['blue_edges']),another_thing['blue_edges'])):
+                nodes.value = float('inf')
+                nodes.wins = 1000000
+                break 
+        #play_random(nodes,Bit_String_Expand.kick_all(thing),turn+1)
+    while(random_games > 0):
+        candidate = copy.deepcopy((best_child(node).board))
+        play_random(best_child(node),Bit_String_Expand.kick_all(candidate),turn+1)
+        random_games -= 1
+        
     #print(node.board)
     #print(Bit_String_Expand.kick_all(node.board))
     print("it is about to be turn:", turn+1)
+    print("the node with the highest value has value", best_child(node).value)
+    print("and has won", best_child(node).wins,"times")
     monte_carlo(turn+1,best_child(node))
 
-def update_statistics(node,value):
+def update_runs(node,value):
+    if(value==1):
+        node.wins+=1
     node.runs += 1
     global total_runs
     total_runs += 1
     node.value = (node.wins+value)/node.runs
-    iterative_update(node)
+    #iterative_update(node)
     return node
 
 def iterative_update(node):
     while node!=root:
         node = node.parent
         for children in node.children:
-            node.value = (children.runs/total_runs)*children.value
+            node.value = (children.runs/total_runs)*(1-children.value)#change 1
 
 def best_child(node):
     return max(node.children,key=value)
 
 def value(node):
     if(node.runs == 0):
-        value = float('inf')
+        value = 1000000000
     else:
-        value = node.value+math.sqrt((2*math.log(total_runs))/node.runs)
+        value = node.value+math.sqrt((math.log(total_runs))/node.runs)
     return value
 
 def play_random(node,graph,player_turn):
     global last_random_red
     global last_random_blue
     node.runs += 1
-    random_games = 1000 
+    random_games = 500
     original_graph = graph
     last_graph = graph
     original_turn = player_turn
-    while random_games > 1:
-        while True:
-            if(player_turn%2 == 1):
-                if(last_random_blue==[]):
-                    last_random_red = random.choice(graph['blank_edges'])
-                    last_graph = color_red(last_random_red,graph)
-                    player_turn += 1
-                    continue
-                elif(not check_win(last_random_blue,last_graph['blue_edges'])):
-                    last_random_red = random.choice(last_graph['blank_edges'])
-                    last_graph = color_red(last_random_red,last_graph)
-                    player_turn += 1
-                    continue
-                else:
-                    node = update_statistics(node,0)
-                    break#I'm definitely going to have to change this later
-            if(player_turn%2 == 0):
-                if(last_random_red==[]):
-                    #print(graph['blank_edges'])
-                    last_random_blue = random.choice(graph['blank_edges'])
-                    last_graph = color_blue(last_random_blue,graph)
-                    player_turn+=1
-                    continue
-                elif(not check_win(last_random_red,last_graph['red_edges'])):    
-                    last_random_blue = random.choice(last_graph['blank_edges'])
-                    last_graph = color_blue(last_random_blue,last_graph)
-                    player_turn+=1
-                    continue
-                else:
-                    node = update_statistics(node,1)
-                    break#this too
-        random_games -= 1
+    #while random_games > 1:
+    while True:
+        if(player_turn%2 == 1):
+            if(last_random_blue==[]):
+                last_random_red = random.choice(graph['blank_edges'])
+                last_graph = color_red(last_random_red,graph)
+                player_turn += 1
+                continue
+            elif(not check_win(last_random_blue,last_graph['blue_edges'])):
+                last_random_red = random.choice(last_graph['blank_edges'])
+                last_graph = color_red(last_random_red,last_graph)
+                player_turn += 1
+                continue
+            elif(player_turn%2 != original_turn%2):
+                node = update_runs(node,1)
+                break
+            else:
+                node = update_runs(node,0)
+                break
+        if(player_turn%2 == 0):
+            if(last_random_red==[]):
+                #print(graph['blank_edges'])
+                last_random_blue = random.choice(graph['blank_edges'])
+                last_graph = color_blue(last_random_blue,graph)
+                player_turn+=1
+                continue
+            elif(not check_win(last_random_red,last_graph['red_edges'])):    
+                last_random_blue = random.choice(last_graph['blank_edges'])
+                last_graph = color_blue(last_random_blue,last_graph)
+                player_turn+=1
+                continue
+            elif(player_turn%2 != original_turn%2):
+                node = update_runs(node,1)
+                break
+            else:
+                node = update_runs(node,0)
+                break
+        #random_games -= 1
         #print("game over")
         #print("random_games is now", random_games)
-        player_turn = original_turn
-        last_random_blue = []
-        last_random_red = []
-        graph = original_graph
+        #player_turn = original_turn
+        #last_random_blue = []
+        #last_random_red = []
+        #graph = original_graph
 
 def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
@@ -279,7 +307,7 @@ def verbose_check_win(Edge,Edges_to_Check):
     takes in the edge just colored and all edges of that color and checks to see if that satisfies the condition for a win.
     Example: [x,y] colored blue. check_win takes[x,y] and all of the blue_edges as input.
     '''
-    #print(Edge,"Edge! Yeah!")
+    print(Edge,"Edge! Yeah!")
     original_edge = Edge
     try:
         colored_list = [[Edge[0],Edge[1]]]
