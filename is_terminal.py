@@ -56,7 +56,7 @@ def update_structure(structure,edge,turn,graph):
                     #graph['val']-= structure[changed_kls[kls]] **3
                 else:
                     n = structure[changed_kls[kls]]
-                    graph['val']+= (n*(n+1)*(2*n+1))/6
+                    graph['val']-= (n*(n+1)*(2*n+1))/6
                     #graph['val']+= (n*(n+1)/2)**2
                     structure[changed_kls[kls]]=float("-inf")
     return(structure,changed_kls)
