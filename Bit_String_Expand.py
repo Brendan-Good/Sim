@@ -50,12 +50,13 @@ def Expand(graph):
     child_graphs = []
     new_graph = []
     
-    for cat_num in range(0,len(graph['abst'])):
-        for cat_num2 in range(cat_num,len(graph['abst'])):
-            if graph['abst'][cat_num] != 0 and graph['abst'][cat_num2] != 0 and(cat_num != cat_num2 or graph['abst'][cat_num]>1):
+    for real_num in range(0,graph['scope']+1):
+        for real_num2 in range(real_num+1,graph['scope']+1):
+            if get_edge(graph,real_num,real_num2) == [False,False]:
                 new_graph = layer_update(graph)
-                new_graph = update_abst_nodes(new_graph,cat_num,cat_num2)
-                child_graphs.append(new_graph)
+                edge = [real_num,real_num2]
+                new_graph = color(edge,new_graph)
+                child_graphs.append(new_graph)        
 
     for real_num in range(0,graph['scope']+1):
         for cat_num in range(0,len(graph['abst'])):
@@ -63,14 +64,17 @@ def Expand(graph):
                 new_graph = layer_update(graph)
                 new_graph =  update_real_abst(new_graph,real_num,cat_num)
                 child_graphs.append(new_graph)
-    
-    for real_num in range(0,graph['scope']+1):
-        for real_num2 in range(real_num+1,graph['scope']+1):
-            if get_edge(graph,real_num,real_num2) == [False,False]:
+
+    for cat_num in range(0,len(graph['abst'])):
+        for cat_num2 in range(cat_num,len(graph['abst'])):
+            if graph['abst'][cat_num] != 0 and graph['abst'][cat_num2] != 0 and(cat_num != cat_num2 or graph['abst'][cat_num]>1):
                 new_graph = layer_update(graph)
-                edge = [real_num,real_num2]
-                new_graph = color(edge,new_graph)
-                child_graphs.append(new_graph)            
+                new_graph = update_abst_nodes(new_graph,cat_num,cat_num2)
+                child_graphs.append(new_graph)
+
+
+    
+    
     
     for child in child_graphs:
         child['turn_number']+=1
