@@ -9,9 +9,9 @@ import copy
 import itertools
 import Bit_String_Expand
 
-Graph_Size = 6 
+Graph_Size = 13 
 
-win_subgraph = 3
+win_subgraph = 4
 
 graph_rep = (Graph_Size*(Graph_Size-1))*BitArray(bin='0')#Create a bitarray which represents a complete graph of size Graph_Size where 
 #each edge is uncolored
@@ -62,56 +62,53 @@ def list_difference(a,b):
     return [edge for edge in a if edge not in b]
 
 def monte_carlo(turn,node=root):
-    random_games = 1200
+    random_games = 1000
     print("monte carlo called")
-    print(Bit_String_Expand.kick_all(node.board))
     global Graph_Size
     if(turn == 15):
         print("game over, I'll do some stuff to figure out who won later.")
     if(turn != 1):
-        print(Bit_String_Expand.kick_all(node.board)['blue_edges'],"blue_edges!")
-        print(Bit_String_Expand.kick_all((node.parent).board)['blue_edges'],"parent_edges!")
-        print(Bit_String_Expand.kick_all(node.board)['red_edges'],"red_edges!")
-        print(Bit_String_Expand.kick_all((node.parent).board)['red_edges'],"parent_edges!")
+        print(node.board['blue_edges'],"blue edges!")
+        print((node.parent).board['blue_edges'],"parent_edges")
+        print(node.board['red_edges'],"red edges!")
+        print((node.parent).board['red_edges'],"parent_edges")
     if(turn != 2 and turn%2==0 and verbose_check_win(list_difference(
-        Bit_String_Expand.kick_all(node.board)['red_edges'],
-        Bit_String_Expand.kick_all((node.parent).board)['red_edges']),Bit_String_Expand.kick_all(node.board)['red_edges'])):
-        verbose_check_win(list_difference(
-        Bit_String_Expand.kick_all(node.board)['red_edges'],
-        Bit_String_Expand.kick_all((node.parent).board)['red_edges']),Bit_String_Expand.kick_all(node.board)['red_edges']) 
+        (node.board)['red_edges'], ((node.parent).board)['red_edges']),(node.board)['red_edges'])):
+        verbose_check_win(list_difference((node.board)['red_edges'],((node.parent).board)['red_edges']),
+        (node.board)['red_edges']) 
         return winning_node
     elif(turn != 1 and turn%2==1 and verbose_check_win(list_difference(
-        Bit_String_Expand.kick_all(node.board)['blue_edges'],
-        Bit_String_Expand.kick_all((node.parent).board)['blue_edges']),
-        Bit_String_Expand.kick_all(node.board)['blue_edges'])):
+        (node.board)['blue_edges'],
+        ((node.parent).board)['blue_edges']),
+        (node.board)['blue_edges'])):
         verbose_check_win(list_difference(
-        Bit_String_Expand.kick_all(node.board)['blue_edges'],
-        Bit_String_Expand.kick_all((node.parent).board)['blue_edges']),
-        Bit_String_Expand.kick_all(node.board)['blue_edges'])
+        (node.board)['blue_edges'],
+        ((node.parent).board)['blue_edges']),
+        (node.board)['blue_edges'])
         return losing_node 
     #while node.children != []:
     #    node = best_child(node)
     #    max_iterations -= 1
-    for boards in Bit_String_Expand.Expand(node.board):
+    for boards in Expand(node.board,turn):
         (node.children).append(Node(node,[],0,0,1000000000,boards))
     for nodes in node.children:
-        thing = copy.deepcopy(nodes.board)
-        also_thing = Bit_String_Expand.kick_all(node.board)
-        another_thing = Bit_String_Expand.kick_all(thing)
+        #thing = copy.deepcopy(nodes.board)
+        #also_thing = Bit_String_Expand.kick_all(node.board)
+        #another_thing = Bit_String_Expand.kick_all(thing)
         if(turn != 1 and turn%2==1):
-            if(verbose_check_win(list_difference(another_thing['red_edges'],also_thing['red_edges']),another_thing['red_edges'])):
+            if(verbose_check_win(list_difference(nodes.board['red_edges'],node.board['red_edges']),nodes.board['red_edges'])):
                 nodes.value = float('inf')
                 nodes.wins = 1000000
                 break
         elif(turn != 2 and turn%2 == 0):
-            if(verbose_check_win(list_difference(another_thing['blue_edges'],also_thing['blue_edges']),another_thing['blue_edges'])):
+            if(verbose_check_win(list_difference(nodes.board['blue_edges'],node.board['blue_edges']),nodes.board['blue_edges'])):
                 nodes.value = float('inf')
                 nodes.wins = 1000000
                 break 
         #play_random(nodes,Bit_String_Expand.kick_all(thing),turn+1)
     while(random_games > 0):
         candidate = copy.deepcopy((best_child(node).board))
-        play_random(best_child(node),Bit_String_Expand.kick_all(candidate),turn+1)
+        play_random(best_child(node),candidate,turn+1)
         random_games -= 1
         
     #print(node.board)
@@ -380,6 +377,16 @@ def get_edges(turns):
         return red_edges
     else:
         return blue_edges
+
+def Expand(board,turn):
+    expanded_list = []
+    for edges in board['blank_edges']:
+        if(turn%2==1):
+            expanded_list.append(color_red(edges,board))    
+        else:
+            expanded_list.append(color_blue(edges,board))
+    return expanded_list
+    
 
 #The following line(s) is/are to see if the code works as expected.
 print(graph['graph_rep'].bin)
