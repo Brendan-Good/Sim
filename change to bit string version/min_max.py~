@@ -159,6 +159,7 @@ def min_manager(graph):
     new_graph = "the unthinkable error"
     val = inf
     for child in Expand.Expand(graph):
+        #short circuits wining moves.
         if child['game_over']:
             return child
         m =  max_of(child,-1*inf,inf)

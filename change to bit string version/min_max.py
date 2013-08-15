@@ -13,7 +13,7 @@ nodes_visited = 0
 glob_turn_num = 1
 
 def make_statistic():
-   '''plays many games and reports the statistics of who wins. '''
+    '''plays many games and reports the statistics of who wins. '''
     red_wins = 0
     blue_wins = 0
     ties = 0

@@ -84,7 +84,7 @@ def update_abst_nodes(graph,cat1,cat2):
     '''changes the number of abstract nodes of differant kinds and kicks
     non-abstract nodes to the BitArray '''
 
-    # connects isolated vertices-
+    # connects two isolated vertices to make an edge of the current players color-
     if cat1 == 0 and cat2 == 0:
         graph['abst'][0]-=2
         if graph['turn_number']%2==1:
@@ -106,7 +106,7 @@ def update_abst_nodes(graph,cat1,cat2):
 def kick_to_graph(graph,abst_type):
     '''Takes a graph and a kind of abstract structure and adds one
     of that abstract structure to the BitArray.
-    returns vert number of the first node kicked so that they can be found later.
+    returns vert number of the first node kicked so that it can be found later.
 
     See top for abst_type meanings.
 
