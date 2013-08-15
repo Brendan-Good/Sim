@@ -1,0 +1,128 @@
+#!/usr/bin/python3
+import min_max
+import min_helper
+import SimMCTest
+import is_terminal
+from bitstring import BitArray
+import Expand
+
+# DOES NOT WORK! Like at all. You have bene warned.
+
+all_edges = []
+
+class Node:
+    def __init__(self,parent,children,runs,wins,value,board):
+        self.self = self
+        self.parent = parent
+        self.children = children
+        self.runs = runs
+        self.wins = wins
+        self.value = value
+        self.board = board
+
+def initialize_graph():
+
+    n = 6
+    l = 3
+    abst = [n,0,0]
+    tuples = is_terminal.generate_structure(n,l)
+    scope = -1
+    turn_number = 1
+    game_over = False
+    val = 0
+    depth_limit = 23
+    graph_rep = (n*(n-1))*BitArray(bin='0')
+    red_edges = []
+    blue_edges = []
+    blank_edges = []
+    total_runs = 1
+    depth_limit = 3
+    global all_edges
+
+    for x in range(n-1):
+        for y in range(x+1,n):
+            blank_edges.append([x,y])
+            all_edges.append([x,y])
+
+    graph = {'tuples':tuples,'abst':abst,'scope':scope,'turn_number':turn_number,'game_over':False,'val':val,'depth_limit':depth_limit,'red_edges':red_edges,'blue_edges':blue_edges,'blank_edges':blank_edges,'total_runs':total_runs,'depth_limit':depth_limit,'graph_rep':graph_rep}
+
+    return graph
+    
+def VS_game():
+
+    old_graph = initialize_graph()
+    new_graph = "error"
+
+    root = []
+
+    while not old_graph['game_over']:
+
+        root = Node(root,[],0,0,0,old_graph)
+        
+        new_graph =  SimMCTest.monte_carlo(old_graph['turn_number'],root)
+        #print("graph post monte_carlo ", new_graph)
+ 
+        min_max.display_graph_b(new_graph,6)
+
+        global all_edges
+        move_num = move_extractor(old_graph,new_graph)
+        changed_edge = all_edges[move_num]
+        new_graph['game_over'] = SimMCTest.check_win(changed_edge,new_graph['red_edges'])
+        if new_graph['game_over']:
+            print("red won")
+
+
+        if not new_graph['game_over']:
+
+            root = Node(root,[],0,0,0,old_graph)
+        
+            new_graph =  SimMCTest.monte_carlo(old_graph['turn_number'],root)
+            #print("graph post monte_carlo ", new_graph)
+        
+            min_max.display_graph_b(new_graph,6)
+
+            global all_edges
+            move_num = move_extractor(old_graph,new_graph)
+            changed_edge = all_edges[move_num]
+            new_graph['game_over'] = SimMCTest.check_win(changed_edge,new_graph['blue_edges'])
+            if new_graph['game_over']:
+                print("red won")
+               
+            old_graph = new_graph
+
+
+def monte_to_min(old_graph,new_graph):
+    global all_edges
+    move_num = move_extractor(old_graph,new_graph)
+    changed_edge = all_edges[move_num]
+    new_graph['game_over'] = is_terminal.is_terminal(new_graph['tuples'],changed_edge,old_graph['turn_number'],new_graph)
+    return new_graph
+
+'''
+totally unnessesary
+
+def min_to_monte(old_graph,new_graph):
+    if old_graph['graph_rep'] != new_graph['graph_rep']:
+        global all_edges
+        move_num = move_extractor(old_graph,new_graph)
+        changed_edge = all_edges[move_num]
+        print("move num and edge found = ", move_num ,"  ", changed_edge)
+        print("blank edge ", new_graph['blank_edges']
+        new_graph['blank_edges'].remove(changed_edge)
+        if new_graph['turn_number']%2 == 1:
+            new_graph['red_edges'].append(changed_edge)
+        else:
+            new_graph['blue_edges'].append(changed_edge)
+    return new_graph
+'''
+
+def move_extractor(changed_graph,unchanged_graph):
+    '''Takes in two BitArrays and returns the index of the first diget the BitArrays differ on. Used on a graph and that graph after a move has been made to find what that move was.'''
+    and_graph = changed_graph['graph_rep'] ^ unchanged_graph['graph_rep']
+
+    location = (and_graph.bin).find('1')
+
+    if location %  2 == 1:
+        location -= 1
+
+    return location
