@@ -65,7 +65,7 @@ def list_difference(a,b):
 
 def monte_carlo(turn,node=root):
     global red_wins
-    random_games = 100
+    random_games = 500
     print("monte carlo called")
     global Graph_Size
     if(turn == 15):
@@ -79,7 +79,6 @@ def monte_carlo(turn,node=root):
         (node.board)['red_edges'], ((node.parent).board)['red_edges']),(node.board)['red_edges'])):
         verbose_check_win(list_difference((node.board)['red_edges'],((node.parent).board)['red_edges']),
         (node.board)['red_edges']) 
-        red_wins = 1
         return winning_node
     elif(turn != 1 and turn%2==1 and verbose_check_win(list_difference(
         (node.board)['blue_edges'],
@@ -101,13 +100,15 @@ def monte_carlo(turn,node=root):
         #another_thing = Bit_String_Expand.kick_all(thing)
         if(turn != 1 and turn%2==1):
             if(verbose_check_win(list_difference(nodes.board['red_edges'],node.board['red_edges']),nodes.board['red_edges'])):
-                nodes.value = float('-inf')
+                nodes.value = -100000000 
                 nodes.wins = 0
+                node.runs = 1
                 break
         elif(turn != 2 and turn%2 == 0):
             if(verbose_check_win(list_difference(nodes.board['blue_edges'],node.board['blue_edges']),nodes.board['blue_edges'])):
-                nodes.value = float('-inf')
+                nodes.value = -100000000
                 nodes.wins = 0
+                node.runs = 1
                 break 
         #play_random(nodes,Bit_String_Expand.kick_all(thing),turn+1)
     while(random_games > 0):
@@ -152,7 +153,7 @@ def play_random(node,graph,player_turn):
     global last_random_red
     global last_random_blue
     node.runs += 1
-    random_games = 1400
+    random_games = 2000
     original_graph = graph
     last_graph = graph
     original_turn = player_turn
@@ -180,7 +181,7 @@ def play_random(node,graph,player_turn):
                 #print(graph['blank_edges'])
                 last_random_blue = random.choice(graph['blank_edges'])
                 last_graph = color_blue(last_random_blue,graph)
-                player_turn+=1
+                player_turn += 1
                 continue
             elif(not check_win(last_random_red,last_graph['red_edges'])):    
                 last_random_blue = random.choice(last_graph['blank_edges'])
