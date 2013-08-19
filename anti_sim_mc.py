@@ -40,8 +40,6 @@ abst = [6,0,0]
 
 scope = -1
 
-max_iterations = 10000#This currently does nothing
-
 total_runs = 1
 
 last_random_blue = []
@@ -65,20 +63,15 @@ def list_difference(a,b):
 
 def monte_carlo(turn,node=root):
     global red_wins
-    random_games = 500
+    random_games = 5000
     print("monte carlo called")
+    print(node.board)
     global Graph_Size
-    if(turn == 15):
-        print("game over, I'll do some stuff to figure out who won later.")
-    if(turn != 1):
-        print(node.board['blue_edges'],"blue edges!")
-        print((node.parent).board['blue_edges'],"parent_edges")
-        print(node.board['red_edges'],"red edges!")
-        print((node.parent).board['red_edges'],"parent_edges")
     if(turn != 2 and turn%2==0 and verbose_check_win(list_difference(
         (node.board)['red_edges'], ((node.parent).board)['red_edges']),(node.board)['red_edges'])):
         verbose_check_win(list_difference((node.board)['red_edges'],((node.parent).board)['red_edges']),
         (node.board)['red_edges']) 
+        red_wins = 1
         return winning_node
     elif(turn != 1 and turn%2==1 and verbose_check_win(list_difference(
         (node.board)['blue_edges'],
@@ -89,35 +82,35 @@ def monte_carlo(turn,node=root):
         ((node.parent).board)['blue_edges']),
         (node.board)['blue_edges'])
         return losing_node 
-    #while node.children != []:
-    #    node = best_child(node)
-    #    max_iterations -= 1
+    if(turn != 1):
+        print(node.board['blue_edges'],"blue edges!")
+        print((node.parent).board['blue_edges'],"parent_edges")
+        print(node.board['red_edges'],"red edges!")
+        print((node.parent).board['red_edges'],"parent_edges")
     for boards in Expand(node.board,turn):
         (node.children).append(Node(node,[],0,0,1000000000,boards))
     for nodes in node.children:
-        #thing = copy.deepcopy(nodes.board)
-        #also_thing = Bit_String_Expand.kick_all(node.board)
-        #another_thing = Bit_String_Expand.kick_all(thing)
         if(turn != 1 and turn%2==1):
             if(verbose_check_win(list_difference(nodes.board['red_edges'],node.board['red_edges']),nodes.board['red_edges'])):
+                verbose_check_win(list_difference(nodes.board['red_edges'],node.board['red_edges']),nodes.board['red_edges'])
+                print("nodes.value is now really low")
                 nodes.value = -100000000 
-                nodes.wins = 0
+                nodes.wins = -4000
                 node.runs = 1
                 break
         elif(turn != 2 and turn%2 == 0):
             if(verbose_check_win(list_difference(nodes.board['blue_edges'],node.board['blue_edges']),nodes.board['blue_edges'])):
+                verbose_check_win(list_difference(nodes.board['blue_edges'],node.board['blue_edges']),nodes.board['blue_edges'])
+                print("nodes.value is now really low")
                 nodes.value = -100000000
-                nodes.wins = 0
+                nodes.wins = -4000
                 node.runs = 1
                 break 
-        #play_random(nodes,Bit_String_Expand.kick_all(thing),turn+1)
     while(random_games > 0):
         candidate = copy.deepcopy((best_child(node).board))
         play_random(best_child(node),candidate,turn+1)
         random_games -= 1
         
-    #print(node.board)
-    #print(Bit_String_Expand.kick_all(node.board))
     print("it is about to be turn:", turn+1)
     print("the node with the highest value has value", best_child(node).value)
     print("and has won", best_child(node).wins,"times")
@@ -130,7 +123,6 @@ def update_runs(node,value):
     global total_runs
     total_runs += 1
     node.value = (node.wins+value)/node.runs
-    #iterative_update(node)
     return node
 
 def iterative_update(node):
@@ -153,11 +145,9 @@ def play_random(node,graph,player_turn):
     global last_random_red
     global last_random_blue
     node.runs += 1
-    random_games = 2000
     original_graph = graph
     last_graph = graph
     original_turn = player_turn
-    #while random_games > 1:
     while True:
         if(player_turn%2 == 1):
             if(last_random_blue==[]):
@@ -178,7 +168,6 @@ def play_random(node,graph,player_turn):
                 break
         if(player_turn%2 == 0):
             if(last_random_red==[]):
-                #print(graph['blank_edges'])
                 last_random_blue = random.choice(graph['blank_edges'])
                 last_graph = color_blue(last_random_blue,graph)
                 player_turn += 1
@@ -194,13 +183,6 @@ def play_random(node,graph,player_turn):
             else:
                 node = update_runs(node,1)
                 break
-        #random_games -= 1
-        #print("game over")
-        #print("random_games is now", random_games)
-        #player_turn = original_turn
-        #last_random_blue = []
-        #last_random_red = []
-        #graph = original_graph
 
 def color_red(edge,graph):
     '''Given an edge represented as a list, the function sorts it and changes the bit corresponding to that edge 10 which 
@@ -208,17 +190,11 @@ def color_red(edge,graph):
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    #print("input for coloring red:")
-    #print(graph['red_edges'],"red")
-    #print(graph['blue_edges'],"blue")
     intermediate_graph = copy.deepcopy(graph)
     intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = False
     intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = True
     intermediate_graph['red_edges'].append(edge)
     intermediate_graph['blank_edges'].remove(edge)
-    #print("just colored red:")
-    #print(intermediate_graph['red_edges'])
-    #print(intermediate_graph['graph_rep'].bin)
     return copy.copy(intermediate_graph)
     
 def color_blue(edge,graph):
@@ -227,23 +203,11 @@ def color_blue(edge,graph):
     edge = sorted(edge)
     m = edge[0]
     n = edge[1]
-    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
-    #graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
-    #graph['blue_edges'] = copy.deepcopy(blue_edges)
-    #graph['blue_edges'].append(edge)
-    #graph['blank_edges'] = copy.deepcopy(blank_edges)
-    #graph['blank_edges'].remove(edge)
-    #return graph
-    #print("input for coloring blue:")
-    #print(graph['blue_edges'],"blue")
-    #print(graph['red_edges'],"red")
     intermediate_graph = copy.deepcopy(graph)
     intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-2] = False
     intermediate_graph['graph_rep'][2*m*Graph_Size-(m*(m+1))+2*n-2*m-1] = True
     intermediate_graph['blue_edges'].append(edge)
     intermediate_graph['blank_edges'].remove(edge)
-    #print("just colored blue:")
-    #print(intermediate_graph['blue_edges'])
     return copy.copy(intermediate_graph)
 
 
@@ -251,16 +215,11 @@ def is_terminal(Edge,Edges_to_Check,turn_number):
     if(turn_number==(n*(n-1))/2 or check_win(Edge,Edges_to_Check)):
         return true
 
-#for is terminal take in an edge [x,y] and a list of colored edges that are of the color of the edge and if the length of this list is 
-# less than (l*(l-1))/2 then it is not terminal. Else find all of the red edges with x as an endpoint and store them.
-# If this is less than l-1, then no. else, 
-
 def check_win(Edge,Edges_to_Check):
     '''
     takes in the edge just colored and all edges of that color and checks to see if that satisfies the condition for a win.
     Example: [x,y] colored blue. check_win takes[x,y] and all of the blue_edges as input.
     '''
-    #print(Edge,"Edge! Yeah!")
     original_edge = Edge
     try:
         colored_list = [[Edge[0],Edge[1]]]
@@ -269,7 +228,6 @@ def check_win(Edge,Edges_to_Check):
         colored_list = [[Edge[0][0],Edge[0][1]]]
     stored_vertices = []
     if (len(Edges_to_Check)<(win_subgraph*(win_subgraph-1))/2):#If there aren't enough edges of the same color as our edge, then false.
-        #print(Edges_to_Check,"Edges_to_Check")
         return False
     else:
         for edges in Edges_to_Check:#If any of our edges in Edges_to_Check has Edge[0] as an endpoint, add the other endpoint to our list of stored verticesn
@@ -282,8 +240,6 @@ def check_win(Edge,Edges_to_Check):
                 if(edges[1]==Edge[0]):
                     colored_list.append(edges)
                     stored_vertices.append(edges[0])
-        #print(stored_vertices,"stored_vertices")
-        #print(colored_list,"colored_list")
         if(len(colored_list)<win_subgraph-1):
             return False
         else:
@@ -299,12 +255,10 @@ def check_win(Edge,Edges_to_Check):
                     for y in range(x+1,win_subgraph):
                         if(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]) in Edges_to_Check):
                             potential_kl.append(connect(l_minus_2_combinations[combinations][x],l_minus_2_combinations[combinations][y]))
-                            #print(potential_kl,"potential_kl")
                 if(len(potential_kl)>=(win_subgraph*(win_subgraph-1))/2):
                     return True
                 else:
                     iterator+=1
-                    #print(iterator)
             if(iterator==len(l_minus_2_combinations)):
                 return False
             
@@ -318,7 +272,6 @@ def verbose_check_win(Edge,Edges_to_Check):
     try:
         colored_list = [[Edge[0],Edge[1]]]
     except IndexError:
-        #print(Edge,"Edge!")
         Edge = [Edge[0][0],Edge[0][1]]
         colored_list = [Edge[0],Edge[1]]
     stored_vertices = []
@@ -341,10 +294,6 @@ def verbose_check_win(Edge,Edges_to_Check):
                     stored_vertices.append(edges[0])
         print(stored_vertices,"stored_vertices")
         print(colored_list,"colored_list")
-        #if(len(colored_list)<win_subgraph-1):
-        #    print(colored_list)
-        #    print("not enough edges of the right color")
-        #    return False
         if(1!=1):
             print("boop")    
         else:
